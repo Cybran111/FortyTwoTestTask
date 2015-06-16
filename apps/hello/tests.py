@@ -4,6 +4,8 @@ from django.test import TestCase
 
 
 class SomeTests(TestCase):
-    def test_math(self):
-        "put docstrings in your tests"
-        assert(2 + 2 == 5)
+    def test_homepage_exists(self):
+        """Is homepage accessable?"""
+
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
