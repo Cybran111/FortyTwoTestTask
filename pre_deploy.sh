@@ -1,1 +1,1 @@
-make collectstatic
+python2 manage.py collectstatic
