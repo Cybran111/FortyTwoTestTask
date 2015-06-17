@@ -24,7 +24,8 @@
     <div>
         <div class="info_block">
             <p> Bio: </p>
-            <p> {{ person.profile.bio }} </p>
+    {{ contact.info | linebreaksbr }}
+            <p> {{ person.profile.bio|linebreaksbr }} </p>
         </div>
         <div class="info_block">
             <p> Other contacts: </p>
