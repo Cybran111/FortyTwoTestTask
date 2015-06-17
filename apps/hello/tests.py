@@ -6,7 +6,7 @@ from django.test import TestCase
 
 class SomeTests(TestCase):
     def test_homepage_exists(self):
-        """ Is homepage accessable? """
+        """Is homepage accessable?"""
 
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
