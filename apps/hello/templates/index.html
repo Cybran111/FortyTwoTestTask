@@ -1,1 +1,37 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/hello.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<h2>42 Coffee Cups Test Assignment</h2>
+
+    <div>
+        <div class="info_block">
+            <p> First name: {{ person.first_name }}</p>
+            <p> Last name: {{ person.last_name }}</p>
+            <p> Date of birth: {{ person.profile.birth_date }}</p>
+        </div>
+        <div class="info_block">
+            <p>Contacts</p>
+            <p>Email: {{ person.email }}</p>
+            <p>Jabber: {{ person.profile.jabber }}</p>
+            <p>Skype: {{ person.profile.skype }}</p>
+        </div>
+    </div>
+    <div>
+        <div class="info_block">
+            <p> Bio: </p>
+            <p> {{ person.profile.bio }} </p>
+        </div>
+        <div class="info_block">
+            <p> Other contacts: </p>
+            <p> {{ person.profile.contacts }} </p>
+        </div>
+
+
+    </div>
+
+{% endblock %}

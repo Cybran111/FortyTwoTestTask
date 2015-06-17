@@ -7,3 +7,5 @@ class Profile(models.Model):
     birth_date = models.DateField()
     bio = models.TextField()
     contacts = models.TextField()
+    jabber = models.TextField()
+    skype = models.TextField()

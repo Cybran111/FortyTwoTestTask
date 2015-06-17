@@ -81,6 +81,24 @@
 },
 {
   "pk": 1, 
+  "model": "south.migrationhistory", 
+  "fields": {
+    "applied": "2015-06-16T16:57:24.823Z", 
+    "app_name": "hello", 
+    "migration": "0001_initial"
+  }
+},
+{
+  "pk": 2, 
+  "model": "south.migrationhistory", 
+  "fields": {
+    "applied": "2015-06-17T06:46:40.289Z", 
+    "app_name": "hello", 
+    "migration": "0002_auto__add_field_profile_jabber__add_field_profile_skype"
+  }
+},
+{
+  "pk": 1, 
   "model": "auth.permission", 
   "fields": {
     "codename": "add_logentry", 
@@ -317,10 +335,12 @@
   "pk": 1, 
   "model": "hello.profile", 
   "fields": {
-    "birth_date": "1995-04-22", 
     "bio": "My bio", 
+    "contacts": "My contacts", 
     "user": 1, 
-    "contacts": "My contacts"
+    "skype": "cybran111", 
+    "birth_date": "1995-04-22", 
+    "jabber": "cybran@42cc.co"
   }
 },
 {
@@ -347,6 +367,19 @@
     "change_message": "Changed first_name and last_name.", 
     "user": 1, 
     "content_type": 4
+  }
+},
+{
+  "pk": 3, 
+  "model": "admin.logentry", 
+  "fields": {
+    "action_flag": 2, 
+    "action_time": "2015-06-17T06:47:19.050Z", 
+    "object_repr": "Profile object", 
+    "object_id": "1", 
+    "change_message": "Changed jabber and skype.", 
+    "user": 1, 
+    "content_type": 8
   }
 }
 ]
