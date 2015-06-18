@@ -15,7 +15,6 @@ class Request(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     method = models.TextField()
     path = models.TextField()
-    statuscode = models.IntegerField()
 
     class Meta:
         ordering = ['-created_at']

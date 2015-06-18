@@ -47,7 +47,7 @@ class RequestsPageTests(TestCase):
         response = self.client.get('/requests/')
 
         self.assertListEqual(
-            list(Request.objects.all()[1:11]),  # last request not in response
+            list(Request.objects.all()[:10]),
             list(response.context["requests"])
         )
 
