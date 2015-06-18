@@ -13,25 +13,22 @@
             <p> First name: {{ person.first_name }}</p>
             <p> Last name: {{ person.last_name }}</p>
             <p> Date of birth: {{ person.profile.birth_date }}</p>
+            <p> Bio: </p>
+            <p> {{ person.profile.bio|linebreaksbr }} </p>
         </div>
         <div class="info_block">
             <p>Contacts</p>
             <p>Email: {{ person.email }}</p>
             <p>Jabber: {{ person.profile.jabber }}</p>
             <p>Skype: {{ person.profile.skype }}</p>
-        </div>
-    </div>
-    <div>
-        <div class="info_block">
-            <p> Bio: </p>
-            <p> {{ person.profile.bio|linebreaksbr }} </p>
-        </div>
-        <div class="info_block">
             <p> Other contacts: </p>
             <p> {{ person.profile.contacts }} </p>
         </div>
+    </div>
 
-
+    <div id="footer">
+        <hr>
+        <a href="{% url "requests" %}"> Requests </a>
     </div>
 
 {% endblock %}

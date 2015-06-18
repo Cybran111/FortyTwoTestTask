@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <table>
+      <tr>
+        <th>Created</th>
+        <th>Method</th>
+        <th>Path</th>
+        <th>Status code</th>
+      </tr>
+          {% for request in requests %}
+          <tr>
+            <td> {{ request.created_at }} </td>
+            <td> {{ request.method }} </td>
+            <td> {{ request.path }} </td>
+            <td> {{ request.statuscode }} </td>
+          </tr>
+          {% endfor %}
+    </table>
+
+{% endblock %}

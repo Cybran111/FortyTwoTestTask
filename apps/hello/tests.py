@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 # Create your tests here.
+from apps.hello.models import Request
 
 
 class HomePageTests(TestCase):
@@ -20,6 +21,7 @@ class HomePageTests(TestCase):
         response = self.client.get('/')
         self.assertEqual(User.objects.get(pk=1), response.context["person"])
 
+
 class RequestsPageTests(TestCase):
     def test_page_exists(self):
         """Is Requests page accessable?"""
@@ -33,8 +35,22 @@ class RequestsPageTests(TestCase):
 
     def test_homepage_context_correct(self):
         """Is view provides correct context?"""
+
+        # making dumb requests
+        self.client.get('/requests/')
+        self.client.get('/requests/')
+        self.client.get('/')
+        self.client.get('/dumb')
+        self.client.get('/')
+
+        # Actually testing
         response = self.client.get('/requests/')
-        self.assertEqual(Request.objects.all()[:10], response.context["requests"])
+
+        self.assertListEqual(
+            list(Request.objects.all()[1:11]),  # last request not in response
+            list(response.context["requests"])
+        )
+
 
 class RequestMiddlewareTest(TestCase):
     def test_middleware_catches_good_get(self):
@@ -56,5 +72,3 @@ class RequestMiddlewareTest(TestCase):
         """Is middleware saves bad POST request?"""
         self.client.post('/somedumblink/')
         self.assertEqual(1, Request.objects.count())
-
-

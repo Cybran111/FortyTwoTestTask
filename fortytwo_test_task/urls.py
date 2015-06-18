@@ -10,5 +10,6 @@ urlpatterns = patterns(
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', 'apps.hello.views.homepage')
+    url(r'^$', 'apps.hello.views.homepage', name="homepage"),
+    url(r'^requests/$', 'apps.hello.views.requests', name="requests")
 )
