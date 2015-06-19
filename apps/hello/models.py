@@ -9,3 +9,12 @@ class Profile(models.Model):
     contacts = models.TextField()
     jabber = models.TextField()
     skype = models.TextField()
+
+
+class Request(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    method = models.TextField()
+    path = models.TextField()
+
+    class Meta:
+        ordering = ['-created_at']

@@ -8,22 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Profile'
-        db.create_table(u'hello_profile', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('birth_date', self.gf('django.db.models.fields.DateField')()),
-            ('bio', self.gf('django.db.models.fields.TextField')()),
-            ('contacts', self.gf('django.db.models.fields.TextField')()),
-            ('jabber', self.gf('django.db.models.fields.TextField')()),
-            ('skype', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal(u'hello', ['Profile'])
+        # Adding field 'Request.created_at'
+        db.add_column(u'hello_request', 'created_at',
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 6, 18, 0, 0), blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'Profile'
-        db.delete_table(u'hello_profile')
+        # Deleting field 'Request.created_at'
+        db.delete_column(u'hello_request', 'created_at')
 
 
     models = {
@@ -72,6 +65,14 @@ class Migration(SchemaMigration):
             'jabber': ('django.db.models.fields.TextField', [], {}),
             'skype': ('django.db.models.fields.TextField', [], {}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'})
+        },
+        u'hello.request': {
+            'Meta': {'ordering': "['-created_at']", 'object_name': 'Request'},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'method': ('django.db.models.fields.TextField', [], {}),
+            'path': ('django.db.models.fields.TextField', [], {}),
+            'statuscode': ('django.db.models.fields.IntegerField', [], {})
         }
     }
 
