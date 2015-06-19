@@ -80,25 +80,32 @@ class RequestsListTest(TestCase):
         self.LAST_ITEM_DELTA = 4  # No matters how far from the end
         self.not_last_item = Request.objects.count() - self.LAST_ITEM_DELTA
 
-    def test_view_returns_right_value_without_providing_last_item_id(self):
-        """If we do not providing id of last item, view should return last 10 items"""
-        response = self.client.get('/requests/list/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')  # AJAX request
-        requests = serializers.serialize('json', list(Request.objects.all()[:10]))
+    def test_view_correct_list_without_providing_last_item_id(self):
+        """If we do not providing id of last item,
+        view should return last 10 items"""
+        response = self.client.get('/requests/list/')  # AJAX request
+        requests = serializers.serialize(
+            'json',
+            list(Request.objects.all()[:10])
+        )
+        self.assertEqual(requests, response.content)
 
-        self.assertEqual(requests, response.body)
-
-    def test_view_returns_right_value_with_providing_last_item_id(self):
-        """If we providing id of last item, view should return JSON accordingly to this value"""
+    def test_view_correct_list_with_providing_last_item_id(self):
+        """If we providing id of last item,
+        view should return JSON accordingly to this value"""
         response = self.client.get('/requests/list/',
-                                   {"last": self.not_last_item},
-                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        requests = serializers.serialize('json', list(Request.objects.all()[:self.LAST_ITEM_DELTA]))
-        self.assertEqual(requests, response.body)
+                                   {"last": self.not_last_item})
+        requests = serializers.serialize(
+            'json',
+            list(Request.objects.all()[:self.LAST_ITEM_DELTA])
+        )
+        self.assertEqual(requests, response.content)
 
     def test_view_process_last_item_correctly(self):
-        """In case when there are no new requests, view should return empty JSON"""
+        """In case when there are no new requests,
+        view should return only this request in list"""
         response = self.client.get('/requests/list/',
-                               {"last": Request.objects.count()},
-                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        requests = serializers.serialize('json', list())
-        self.assertEqual(requests, response.body)
+                                   {"last": Request.objects.count()})
+        requests = serializers.serialize('json',
+                                         list(Request.objects.all()[0:1]))
+        self.assertEqual(requests, response.content)
