@@ -71,6 +71,30 @@ DATABASES = {
     }
 }
 
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'verbose',
+        }
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'formatters': {
+        'verbose': {
+            'format':
+                "[%(asctime)s] [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        }
+    },
+}
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
