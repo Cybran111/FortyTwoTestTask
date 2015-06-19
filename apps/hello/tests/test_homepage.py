@@ -43,15 +43,27 @@ class EditPersonPageTests(TestCase):
     def setUp(self):
         self.response = self.client.get('/edit/')
 
-    def test_homepage_exists(self):
+    def test_editpage_exists(self):
         """Is homepage accessable?"""
         self.assertEqual(self.response.status_code, 200)
 
-    def test_homepage_correct_template(self):
+    def test_editpage_correct_template(self):
         """Is view uses correct template?"""
         self.assertTemplateUsed(self.response, 'editpage.html')
 
-    def test_homepage_context_correct(self):
+    def test_editpage_context_correct(self):
         """Is view provides correct context?"""
         self.assertEqual(EditProfileForm(),
                          self.response.context["editform"])
+
+
+class AuthPagesTests(TestCase):
+    def test_loginpage_exists(self):
+        """Is login page accessable?"""
+        response = self.client.get("/login/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_logoutpage_exists(self):
+        """Is logout page accessable?"""
+        response = self.client.get("/logout/")
+        self.assertEqual(response.status_code, 200)
