@@ -1,12 +1,12 @@
-.info_block {
-    float: left;
-    width: 50%;
-}
+/*.info_block {*/
+    /*float: left;*/
+    /*width: 50%;*/
+/*}*/
 
 #footer {
     bottom: 0;
-    height: 100px;
-    left: 0;
+    height: 70px;
+    left: 50px;
     position: absolute;
     width: 100%;
 }
