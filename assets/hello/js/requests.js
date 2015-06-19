@@ -20,12 +20,12 @@ $( document ).ready(function() {
 
     function updateTable () {
         $.getJSON("list/", {"last_id": last_id}, function (data) {
-            missedRequests = missedRequests + data[0].pk - last_id;
 
             if (isActive) {
                 document.title = initialTitle;
                 missedRequests = 0;
             } else {
+                missedRequests = missedRequests + data[0].pk - last_id;
                 if (missedRequests != 0) {
                     document.title = "(" + missedRequests +") " + initialTitle;
                 }
@@ -33,7 +33,6 @@ $( document ).ready(function() {
             last_id = data[0].pk;
             $.each(data, function (key, value) {
 
-                    $(".request").last().remove();
 
                     newRow = clonedRequestRow.clone();
                     newDom = $(newRow).get(0);
@@ -43,8 +42,9 @@ $( document ).ready(function() {
                     $(newDom).find(".request-path").text(value.fields.path);
 
                     $(newRow).insertAfter("#table-header");
-                }
-            );
+            });
+
+            $(".request").slice(10).remove();
         })
     }
 
