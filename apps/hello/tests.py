@@ -76,9 +76,10 @@ class RequestMiddlewareTest(TestCase):
 
 
 class RequestsListTest(TestCase):
+    fixtures = ['requests.json']
+
     def setUp(self):
         self.LAST_ITEM_DELTA = 4  # No matters how far from the end
-        self.not_last_item = Request.objects.count() - self.LAST_ITEM_DELTA
 
     def test_view_correct_list_without_providing_last_item_id(self):
         """If we do not providing id of last item,
@@ -93,8 +94,10 @@ class RequestsListTest(TestCase):
     def test_view_correct_list_with_providing_last_item_id(self):
         """If we providing id of last item,
         view should return JSON accordingly to this value"""
-        response = self.client.get('/requests/list/',
-                                   {"last": self.not_last_item})
+        # We should do +1 because of new request
+        response = self.client.get(
+            '/requests/list/',
+            {"last_id": Request.objects.count() - self.LAST_ITEM_DELTA + 1})
         requests = serializers.serialize(
             'json',
             list(Request.objects.all()[:self.LAST_ITEM_DELTA])
@@ -105,7 +108,7 @@ class RequestsListTest(TestCase):
         """In case when there are no new requests,
         view should return only this request in list"""
         response = self.client.get('/requests/list/',
-                                   {"last": Request.objects.count()})
+                                   {"last_id": Request.objects.count()})
         requests = serializers.serialize('json',
                                          list(Request.objects.all()[0:1]))
         self.assertEqual(requests, response.content)

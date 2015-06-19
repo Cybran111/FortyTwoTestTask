@@ -19,9 +19,13 @@ def requests(request):
                   {"requests": Request.objects.all()[:MAX_REQUESTS]})
 
 
-def requests_list(request, last_item=0):
+def requests_list(request):
     return HttpResponse(
         serializers.serialize(
             'json',
-            list(Request.objects.filter(id__gte=last_item)[:MAX_REQUESTS])),
+            list(
+                Request.objects.filter(
+                    id__gt=request.GET.get("last_id", 0)
+                )[:MAX_REQUESTS])
+        ),
         content_type="application/json")
