@@ -81,6 +81,10 @@ class RequestMiddlewareTest(TestCase):
         """Is middleware saves bad POST request?"""
         self.client.post('/somedumblink/')
         self.assertEqual(1, Request.objects.count())
+        
+    def test_middleware_doesnt_catches_per_pool_reqs(self):
+        self.client.get('/requests/list/')
+        self.assertEqual(0, Request.objects.count())
 
 
 class RequestsListTest(TestCase):
