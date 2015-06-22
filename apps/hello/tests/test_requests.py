@@ -18,7 +18,8 @@ class RequestsPageTests(TestCase):
     def test_homepage_context_correct(self):
         """Is view provides correct context?"""
         self.assertListEqual(
-            list(Request.objects.all()[:10]),
+            list(Request.objects.order_by("created_at")[:10]),
+
             list(self.response.context["requests"])
         )
 
@@ -61,7 +62,7 @@ class RequestsListTest(TestCase):
         response = self.client.get('/requests/list/')  # AJAX request
         requests = serializers.serialize(
             'json',
-            list(Request.objects.all()[:10])
+            list(Request.objects.order_by("created_at")[:10])
         )
         self.assertEqual(requests, response.content)
 
@@ -84,5 +85,5 @@ class RequestsListTest(TestCase):
         response = self.client.get('/requests/list/',
                                    {"last_id": Request.objects.count()-1})
         requests = serializers.serialize('json',
-                                         list(Request.objects.all()[0:1]))
+                                         list(Request.objects.order_by("created_at")[0:1]))
         self.assertEqual(requests, response.content)
