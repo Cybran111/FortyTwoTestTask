@@ -1,8 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.test import TestCase
-
-# Create your tests here.
 from apps.hello.models import Profile
 
 
@@ -39,6 +37,7 @@ class HomePageTests(TestCase):
         self.assertEqual(User.objects.get(username="admin"),
                          self.response.context["person"])
 
+
 class EditPersonPageTests(TestCase):
     def setUp(self):
         self.response = self.client.get('/edit/')
@@ -66,7 +65,7 @@ class AuthPagesTests(TestCase):
     def test_loginpage_uses_correct_template(self):
         """Is login page accessable?"""
         response = self.client.get("/accounts/login/")
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'registration/login.html')
 
     def test_logoutpage_exists(self):
         """Is logout page accessable?"""
