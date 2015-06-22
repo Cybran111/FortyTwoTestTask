@@ -39,6 +39,7 @@ class HomePageTests(TestCase):
         self.assertEqual(User.objects.get(username="admin"),
                          self.response.context["person"])
 
+
 class EditPersonPageTests(TestCase):
     def setUp(self):
         self.response = self.client.get('/edit/')

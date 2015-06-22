@@ -44,8 +44,9 @@ class RequestMiddlewareTest(TestCase):
         """Is middleware saves bad POST request?"""
         self.client.post('/somedumblink/')
         self.assertEqual(1, Request.objects.count())
-        
+
     def test_middleware_doesnt_catches_per_pool_reqs(self):
+        """Middleware shouldn't catch requests to '/requests/list/'"""
         self.client.get('/requests/list/')
         self.assertEqual(0, Request.objects.count())
 
@@ -54,8 +55,7 @@ class RequestsListTest(TestCase):
     fixtures = ['requests.json']
 
     def setUp(self):
-        self.LAST_ITEM_DELTA = 4  # No matters how far from the end
-        self.REQUESTS_COUNT = Request.objects.count()
+        self.LAST_ITEM_ID = 6  # No matters how far from the end
 
     def test_view_correct_list_without_providing_last_item_id(self):
         """If we do not providing id of last item,
@@ -69,12 +69,12 @@ class RequestsListTest(TestCase):
 
         response = self.client.get(
             '/requests/list/',
-            {"last_id": self.REQUESTS_COUNT - self.LAST_ITEM_DELTA}
+            {"last_id": self.LAST_ITEM_ID}
         )
 
         requests = serializers.serialize(
             'json',
-            list(Request.objects.order_by("created_at")[self.REQUESTS_COUNT-self.LAST_ITEM_DELTA:])
+            list(Request.objects.order_by("created_at")[self.LAST_ITEM_ID:])
         )
 
         self.assertEqual(requests, response.content)
