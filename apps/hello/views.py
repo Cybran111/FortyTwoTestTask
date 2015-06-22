@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.forms import model_to_dict
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 
 
@@ -29,12 +29,12 @@ def requests(request):
 
 
 def requests_list(request):
+    if "last_id" not in request.GET:
+        return HttpResponseBadRequest()
+
     return HttpResponse(
         serializers.serialize(
             'json',
-            list(
-                Request.objects.filter(
-                    id__gt=request.GET.get("last_id", 0)
-                )[:MAX_REQUESTS])
+            list(Request.objects.filter(id__gt=request.GET["last_id"]))
         ),
         content_type="application/json")
