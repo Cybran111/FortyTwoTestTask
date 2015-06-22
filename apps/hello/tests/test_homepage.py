@@ -44,7 +44,7 @@ class EditPersonPageTests(TestCase):
         self.response = self.client.get('/edit/')
 
     def test_editpage_exists(self):
-        """Is homepage accessable?"""
+        """Is edit page accessable?"""
         self.assertEqual(self.response.status_code, 200)
 
     def test_editpage_correct_template(self):
@@ -60,10 +60,15 @@ class EditPersonPageTests(TestCase):
 class AuthPagesTests(TestCase):
     def test_loginpage_exists(self):
         """Is login page accessable?"""
-        response = self.client.get("/login/")
+        response = self.client.get("/accounts/login/")
         self.assertEqual(response.status_code, 200)
+
+    def test_loginpage_uses_correct_template(self):
+        """Is login page accessable?"""
+        response = self.client.get("/accounts/login/")
+        self.assertTemplateUsed(response, 'login.html')
 
     def test_logoutpage_exists(self):
         """Is logout page accessable?"""
-        response = self.client.get("/logout/")
+        response = self.client.get("/accounts/logout/")
         self.assertEqual(response.status_code, 200)
