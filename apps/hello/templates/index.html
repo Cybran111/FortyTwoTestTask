@@ -6,12 +6,15 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
 {% endblock %}
 
-{#{% block body_class %}container-fluid{% endblock %}#}
-
 {% block content %}
 
     <div class="container-fluid">
-    <h2>42 Coffee Cups Test Assignment</h2>
+        <div class="page-header">
+            <h2>
+                42 Coffee Cups Test Assignment
+                <small class="pull-right"><a href="{% url "login" %}">Login</a></small>
+            </h2>
+        </div>
         <div class="col-md-6">
 
             <div class="panel panel-default">

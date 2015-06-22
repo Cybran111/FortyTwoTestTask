@@ -66,7 +66,7 @@ class AuthPagesTests(TestCase):
     def test_loginpage_uses_correct_template(self):
         """Is login page accessable?"""
         response = self.client.get("/accounts/login/")
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'registration/login.html')
 
     def test_logoutpage_exists(self):
         """Is logout page accessable?"""
