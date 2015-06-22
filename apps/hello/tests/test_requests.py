@@ -48,10 +48,6 @@ class RequestMiddlewareTest(TestCase):
         self.client.get('/requests/list/')
         self.assertEqual(0, Request.objects.count())
 
-    def test_middleware_doesnt_catches_per_pool_reqs(self):
-        self.client.get('/requests/list/')
-        self.assertEqual(0, Request.objects.count())
-
 
 class RequestsListTest(TestCase):
     fixtures = ['requests.json']
