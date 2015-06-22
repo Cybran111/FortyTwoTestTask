@@ -7,8 +7,8 @@ Use fortytwo_test_task.settings when deploying with getbarista.com
 
 ### Recomendations
 * apps in apps/ folder
-* use perapp templates folders
-* use perapp static folders
+* use per-app templates folders
+* use per-app static folders
 * use migrations
 * use settings.local for different environments
 * common templates live in templates/
