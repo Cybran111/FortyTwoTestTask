@@ -3,12 +3,13 @@ from apps.hello.models import Request
 
 
 class RequestsMiddleware:
-    IGNORE_FILTERS = [
+    IGNORE_FILTERS = (
         reverse('requests_list'),
-    ]
+    )
 
     def process_request(self, request):
         """Storing every request that's not in IGNORE_FILTERS to DB"""
-        if request.path not in self.IGNORE_FILTERS:
-            Request.objects.create(method=request.method,
-                                   path=request.path)
+        if request.path in self.IGNORE_FILTERS:
+            return
+
+        Request.objects.create(method=request.method, path=request.path)
