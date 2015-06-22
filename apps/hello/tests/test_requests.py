@@ -1,44 +1,6 @@
-from datetime import datetime
-from django.contrib.auth.models import User
 from django.core import serializers
 from django.test import TestCase
-
-# Create your tests here.
-from apps.hello.models import Request, Profile
-
-
-class HomePageTests(TestCase):
-    def setUp(self):
-        self.response = self.client.get('/')
-
-    def test_homepage_exists(self):
-        """Is homepage accessable?"""
-        self.assertEqual(self.response.status_code, 200)
-
-    def test_homepage_correct_template(self):
-        """Is view uses correct template?"""
-        self.assertTemplateUsed(self.response, 'index.html')
-
-    def test_homepage_context_correct(self):
-        """Is view provides correct context?"""
-        self.assertEqual(User.objects.get(pk=1),
-                         self.response.context["person"])
-
-    def test_homepage_should_return_only_admin_info(self):
-        """If we have another registered user (superuser) in DB,
-        we should see only the first admin"""
-        second_admin = User.objects.create_superuser("ad", "min", "superuser")
-        Profile.objects.create(
-            user=second_admin,
-            birth_date=datetime.now(),
-            bio="bio",
-            contacts="contacts",
-            jabber="jabber",
-            skype="skype"
-        )
-
-        self.assertEqual(User.objects.get(username="admin"),
-                         self.response.context["person"])
+from apps.hello.models import Request
 
 
 class RequestsPageTests(TestCase):
@@ -82,6 +44,10 @@ class RequestMiddlewareTest(TestCase):
         self.client.post('/somedumblink/')
         self.assertEqual(1, Request.objects.count())
 
+    def test_middleware_doesnt_catches_per_pool_reqs(self):
+        self.client.get('/requests/list/')
+        self.assertEqual(0, Request.objects.count())
+
 
 class RequestsListTest(TestCase):
     fixtures = ['requests.json']
@@ -102,10 +68,9 @@ class RequestsListTest(TestCase):
     def test_view_correct_list_with_providing_last_item_id(self):
         """If we providing id of last item,
         view should return JSON accordingly to this value"""
-        # We should do +1 because of new request
         response = self.client.get(
             '/requests/list/',
-            {"last_id": Request.objects.count() - self.LAST_ITEM_DELTA + 1})
+            {"last_id": Request.objects.count() - self.LAST_ITEM_DELTA})
         requests = serializers.serialize(
             'json',
             list(Request.objects.all()[:self.LAST_ITEM_DELTA])
@@ -115,8 +80,9 @@ class RequestsListTest(TestCase):
     def test_view_process_last_item_correctly(self):
         """In case when there are no new requests,
         view should return only this request in list"""
+        self.client.get('/admin/')
         response = self.client.get('/requests/list/',
-                                   {"last_id": Request.objects.count()})
+                                   {"last_id": Request.objects.count()-1})
         requests = serializers.serialize('json',
                                          list(Request.objects.all()[0:1]))
         self.assertEqual(requests, response.content)
