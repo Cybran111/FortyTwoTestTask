@@ -45,7 +45,7 @@ class RequestMiddlewareTest(TestCase):
         self.client.post('/somedumblink/')
         self.assertEqual(1, Request.objects.count())
 
-    def test_middleware_doesnt_catches_per_pool_reqs(self):
+    def test_middleware_doesnt_catches_per_pool_requests(self):
         """Middleware shouldn't catch requests to '/requests/list/'"""
         self.client.get('/requests/list/')
         self.assertEqual(0, Request.objects.count())
