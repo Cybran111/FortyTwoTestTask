@@ -25,7 +25,8 @@ def homepage(request):
 
 
 def editpage(request):
-    return render(request, "editpage.html", {"editform": EditProfileForm()})
+    editform = EditProfileForm(request.POST or None)
+    return render(request, "editpage.html", {"editform": editform})
 
 
 def requests(request):
