@@ -1,4 +1,5 @@
 from django.test import TestCase
+from apps.hello.forms import EditProfileForm
 
 
 class EditPersonPageTests(TestCase):
@@ -15,5 +16,5 @@ class EditPersonPageTests(TestCase):
 
     def test_editpage_context_correct(self):
         """Is view provides correct context?"""
-        self.assertEqual(EditProfileForm(),
-                         self.response.context["editform"])
+        self.assertIsInstance(self.response.context["editform"],
+                              EditProfileForm)

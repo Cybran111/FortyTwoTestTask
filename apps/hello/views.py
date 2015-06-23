@@ -4,6 +4,7 @@ from django.core import serializers
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
+from apps.hello.forms import EditProfileForm
 from apps.hello.models import Request
 
 MAX_REQUESTS = 10
@@ -21,6 +22,10 @@ def homepage(request):
                                for k, v in model_to_dict(person).iteritems())))
 
     return render(request, "index.html", {"person": person})
+
+
+def editpage(request):
+    return render(request, "editpage.html", {"editform": EditProfileForm()})
 
 
 def requests(request):
