@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.contrib import admin
 admin.autodiscover()
@@ -25,4 +27,4 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(auth_patterns)),
     url(r'^requests/', include(requests_patterns)),
-)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

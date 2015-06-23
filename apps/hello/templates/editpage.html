@@ -1,6 +1,37 @@
-{% extends "base.html" %}
 
+{% extends "index.html" %}
 
-{% block content %}
-{{ editform }}
+{% block person-info %}
+    <p> First name: {{ editform.firstname }}</p>
+    <p> Last name: {{ editform.lastname }}</p>
+    <p> Date of birth: {{ editform.birthdate }}</p>
+{% endblock %}
+
+{% block person-photo %}
+    <img src="{{ person.profile.photo.url }}" />
+    {{ editform.photo }}
+{% endblock %}
+
+{% block person-generalcontacts %}
+    <p>Email: {{ editform.email }}</p>
+    <p>Jabber: {{ editform.jabber }}</p>
+    <p>Skype: {{ editform.skype }}</p>
+{% endblock %}
+
+{% block person-othercontacts %}
+    <p> {{ editform.contacts }} </p>
+{% endblock %}
+
+{% block person-bio %}
+    {{ editform.bio|linebreaksbr }}
+{% endblock %}
+
+{% block pre_content %}
+<form class="form-horizontal" method="post">
+{% endblock %}
+
+{% block post_content %}
+    <a class="btn">Save</a>
+    <a class="btn">Cancel</a>
+    </form>
 {% endblock %}
