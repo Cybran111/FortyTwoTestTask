@@ -17,4 +17,4 @@ class Request(models.Model):
     path = models.TextField()
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['created_at']

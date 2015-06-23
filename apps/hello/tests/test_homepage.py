@@ -1,8 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.test import TestCase
-
-# Create your tests here.
 from apps.hello.models import Profile
 
 
@@ -38,6 +36,7 @@ class HomePageTests(TestCase):
 
         self.assertEqual(User.objects.get(username="admin"),
                          self.response.context["person"])
+
 
 class EditPersonPageTests(TestCase):
     def setUp(self):
