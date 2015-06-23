@@ -9,8 +9,20 @@ class Profile(models.Model):
     contacts = models.TextField()
     jabber = models.TextField()
     skype = models.TextField()
-    photo = models.ImageField(upload_to="pictures/",
-                              default="pictures/notfound.jpg")
+    photo = models.ImageField(upload_to="pictures/", default="pictures/notfound.jpg")
+
+    def to_dict(self):
+        return {
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+            "birth_date": self.birth_date,
+            "photo": self.photo,
+            "email": self.user.email,
+            "jabber": self.jabber,
+            "skype": self.skype,
+            "contacts": self.contacts,
+            "bio": self.bio,
+        }
 
 
 class Request(models.Model):
