@@ -8,10 +8,13 @@ $( document ).ready(function() {
     var isActive;
     var clonedRequestRow = $(".request").last().clone();
     var last_id = $(clonedRequestRow).attr('id');
-    var missedRequests = 0;
+    var missedRequests = 0
+    var newRow, newDom;
 
     window.onfocus = function () {
         isActive = true;
+        document.title = initialTitle;
+        missedRequests = 0;
     };
 
     window.onblur = function () {
@@ -21,19 +24,15 @@ $( document ).ready(function() {
     function updateTable () {
         $.getJSON("list/", {"last_id": last_id}, function (data) {
 
-            if (isActive) {
-                document.title = initialTitle;
-                missedRequests = 0;
-            } else {
-                if (data.length != 0)
-                    missedRequests = missedRequests + data[data.length-1].pk - last_id;
-                    if (missedRequests != 0) {
-                        document.title = "(" + missedRequests +") " + initialTitle;
-                    }
+            if (data.length != 0) {
+                if (!isActive) {
+                    missedRequests = missedRequests + data[data.length - 1].pk - last_id;
+                    document.title = "(" + missedRequests + ") " + initialTitle;
+                }
+                last_id = data[data.length-1].pk;
             }
-            last_id = data[data.length-1].pk;
             $.each(data, function (key, value) {
-                newRow = clonedRequestRow.clone();
+                    newRow = clonedRequestRow.clone();
                     newDom = $(newRow).get(0);
 
                     $(newDom).find(".request-createdat").text(
