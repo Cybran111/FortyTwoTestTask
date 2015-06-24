@@ -28,7 +28,7 @@ class RequestsPageTests(TestCase):
         self.assertListEqual(
             list(Request.objects.order_by("created_at")
                  .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
-                 [:10]),
+                 [:hello_settings.MAX_REQUESTS]),
             list(self.response.context["requests"])
         )
 

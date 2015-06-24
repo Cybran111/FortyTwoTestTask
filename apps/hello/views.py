@@ -1,16 +1,11 @@
+import logging
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 import settings as hello_settings
-
-
-# Create your views here.
-import logging
 from apps.hello.models import Request
-
-MAX_REQUESTS = 10
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +22,7 @@ def homepage(request):
 def requests(request):
     request_models = Request.objects.exclude(
         path__in=hello_settings.REQUESTS_IGNORE_FILTERS
-    )[:MAX_REQUESTS]
+    )[:hello_settings.MAX_REQUESTS]
     return render(request, "requests.html", {"requests": request_models})
 
 

@@ -4,3 +4,4 @@ from django.core.urlresolvers import reverse
 REQUESTS_IGNORE_FILTERS = (
     reverse('requests_list'),
 )
+MAX_REQUESTS = 10
