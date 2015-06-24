@@ -54,7 +54,6 @@ class RequestMiddlewareTest(TestCase):
         self.client.post('/somedumblink/')
         self.assertEqual(1, Request.objects.count())
 
-
     def test_middleware_doesnt_catches_banned_requests(self):
         """Middleware shouldn't catch requests
         that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""

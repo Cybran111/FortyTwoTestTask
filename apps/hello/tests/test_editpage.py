@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django import forms
 from django.test import TestCase
 from apps.hello.forms import EditProfileForm
+from apps.hello.models import Profile
 
 
 class EditPersonPageTests(TestCase):
@@ -26,6 +27,13 @@ class EditPersonPageTests(TestCase):
         self.assertIsInstance(self.response.context["editform"],
                               EditProfileForm)
 
+    def test_editform_has_correct_initial_data(self):
+        person = Profile.objects.get(pk=1)
+        self.assertDictEqual(
+            self.response.context["editform"].initial,
+            person.to_dict()
+        )
+
 
 class EditPersonFormTests(TestCase):
     ERROR_MESSAGES = {
@@ -33,33 +41,32 @@ class EditPersonFormTests(TestCase):
         "invalid_date": "Enter a valid date.",
         "invalid_email": "Enter a valid email address.",
     }
+    CORRECT_WIDGETS = {
+        "bio": forms.Textarea,
+        "contacts": forms.Textarea
+    }
+
+    def test_form_has_correct_widgets(self):
+        form = EditProfileForm()
+        for field, widget in self.CORRECT_WIDGETS.iteritems():
+            self.assertIsInstance(form.fields[field].widget, widget)
 
     def test_form_checks_data_for_correctness(self):
         """Testing form with correct data"""
-        user = User.objects.get(pk=1)
-        form_data = {
-            'firstname': user.first_name,
-            'lastname': user.last_name,
-            'birthdate': user.profile.birth_date,
-            'bio': user.profile.bio,
-            'email': user.email,
-            'jabber': user.profile.jabber,
-            'skype': user.profile.skype,
-            'contacts': user.profile.contacts,
-        }
-        form = EditProfileForm(data=form_data,
-                               files={'photo': user.profile.photo})
+        person = Profile.objects.get(pk=1)
+        form = EditProfileForm(data=person.to_dict(),
+                               files={'photo': person.photo})
         self.assertTrue(form.is_valid())
 
     def test_form_checks_data_incorrectness(self):
         """Testing form with invalid data"""
-        def assertEditForm(field, error):
+        def assert_editform(field, error):
             self.assertFormError(response, "editform", field, error)
 
         form_data = {
-            'firstname': "",  # blank
-            'lastname': "",  # blank
-            'birthdate': "not a date",
+            'first_name': "",  # blank
+            'last_name': "",  # blank
+            'birth_date': "not a date",
             'bio': "",  # blank
             'email': "not an email",
             'jabber': "",  # blank
@@ -69,12 +76,12 @@ class EditPersonFormTests(TestCase):
         }
         response = self.client.post(reverse("editpage"), data=form_data)
 
-        assertEditForm("firstname", self.ERROR_MESSAGES["required"])
-        assertEditForm("lastname", self.ERROR_MESSAGES["required"])
-        assertEditForm("birthdate", self.ERROR_MESSAGES["invalid_date"])
-        assertEditForm("bio", self.ERROR_MESSAGES["required"])
-        assertEditForm("email", self.ERROR_MESSAGES["invalid_email"])
-        assertEditForm("jabber", self.ERROR_MESSAGES["required"])
-        assertEditForm("skype", self.ERROR_MESSAGES["required"])
-        assertEditForm("contacts", self.ERROR_MESSAGES["required"])
-        assertEditForm("photo", self.ERROR_MESSAGES["required"])
+        assert_editform("first_name", self.ERROR_MESSAGES["required"])
+        assert_editform("last_name", self.ERROR_MESSAGES["required"])
+        assert_editform("birth_date", self.ERROR_MESSAGES["invalid_date"])
+        assert_editform("bio", self.ERROR_MESSAGES["required"])
+        assert_editform("email", self.ERROR_MESSAGES["invalid_email"])
+        assert_editform("jabber", self.ERROR_MESSAGES["required"])
+        assert_editform("skype", self.ERROR_MESSAGES["required"])
+        assert_editform("contacts", self.ERROR_MESSAGES["required"])
+        assert_editform("photo", self.ERROR_MESSAGES["required"])
