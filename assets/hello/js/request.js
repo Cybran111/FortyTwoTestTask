@@ -8,7 +8,7 @@ $( document ).ready(function() {
     var isActive;
     var clonedRequestRow = $(".request").last().clone();
     var last_id = $(clonedRequestRow).attr('id');
-    var missedRequests = 0
+    var missedRequests = 0;
     var newRow, newDom;
 
     window.onfocus = function () {
