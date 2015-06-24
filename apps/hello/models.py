@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django_resized import ResizedImageField
 
 
 class Profile(models.Model):
@@ -9,7 +10,8 @@ class Profile(models.Model):
     contacts = models.TextField()
     jabber = models.TextField()
     skype = models.TextField()
-    photo = models.ImageField(upload_to="pictures/",
+    photo = ResizedImageField(size=[200, 200],
+                              upload_to="pictures/",
                               default="pictures/notfound.jpg")
 
     def to_dict(self):
