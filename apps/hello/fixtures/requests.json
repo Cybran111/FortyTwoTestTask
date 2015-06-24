@@ -106,5 +106,14 @@
     "created_at": "2015-06-22T10:17:40.750Z", 
     "method": "GET"
   }
+},
+{
+  "pk": 13,
+  "model": "hello.request",
+  "fields": {
+    "path": "/requests/list/",
+    "created_at": "2015-06-22T10:17:45.750Z",
+    "method": "GET"
+  }
 }
 ]
