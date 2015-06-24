@@ -22,18 +22,15 @@ class RequestsPageTests(TestCase):
         self.assertTemplateUsed(self.response, 'requests.html')
 
     def test_requests_page_context_correct(self):
-        """Is view provides correct context?"""
+        """Is view provides correct context?
+        Requests page shouldn't contains requests
+        that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""
         self.assertListEqual(
-            list(Request.objects.order_by("created_at")[:10]),
+            list(Request.objects.order_by("created_at")
+                 .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
+                 [:10]),
             list(self.response.context["requests"])
         )
-
-    def test_requests_page_shouldnt_show_banned_requests(self):
-        """Requests page shouldn't contains requests
-        that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""
-        response = self.client.get('/requests/')
-        requests = Request.objects.order_by("created_at").exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
-        self.assertEqual(requests, response.context["requests"])
 
 
 class RequestMiddlewareTest(TestCase):
@@ -76,7 +73,9 @@ class RequestsListTest(TestCase):
 
     def test_view_correct_list_with_providing_last_item_id(self):
         """If we providing id of last item,
-        view should return JSON accordingly to this value"""
+        view should return JSON accordingly to this value.
+        Also, view shouldn't return requests
+        that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""
 
         response = self.client.get(
             '/requests/list/',
@@ -85,20 +84,9 @@ class RequestsListTest(TestCase):
 
         requests = serializers.serialize(
             'json',
-            list(Request.objects.order_by("created_at")[LAST_ITEM_ID:])
+            list(Request.objects.order_by("created_at")
+                 .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
+                 [LAST_ITEM_ID:])
         )
-
-        self.assertEqual(requests, response.content)
-
-    def test_view_doesnt_show_banned_requests(self):
-        """requests/list shouldn't return requests
-        that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""
-
-        response = self.client.get('/requests/list/', {"last_id": LAST_ITEM_ID})
-
-        requests = serializers.serialize('json',
-                                         list(Request.objects.order_by("created_at")
-                                              .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
-                                              [LAST_ITEM_ID:]))
 
         self.assertEqual(requests, response.content)
