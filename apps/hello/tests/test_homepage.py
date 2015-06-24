@@ -37,7 +37,6 @@ class HomePageTests(TestCase):
         self.assertEqual(User.objects.get(username="admin"),
                          self.response.context["person"])
 
-
 class AuthPagesTests(TestCase):
     def test_loginpage_exists(self):
         """Is login page accessable?"""

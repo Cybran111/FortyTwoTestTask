@@ -5,9 +5,8 @@ from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from apps.hello.forms import EditProfileForm
+import settings as hello_settings
 from apps.hello.models import Request
-
-MAX_REQUESTS = 10
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +29,10 @@ def editpage(request):
 
 
 def requests(request):
-    return render(request, "requests.html",
-                  {"requests": Request.objects.all()[:MAX_REQUESTS]})
+    request_models = Request.objects.exclude(
+        path__in=hello_settings.REQUESTS_IGNORE_FILTERS
+    )[:hello_settings.MAX_REQUESTS]
+    return render(request, "requests.html", {"requests": request_models})
 
 
 def requests_list(request):
@@ -41,6 +42,7 @@ def requests_list(request):
     return HttpResponse(
         serializers.serialize(
             'json',
-            list(Request.objects.filter(id__gt=request.GET["last_id"]))
+            list(Request.objects.filter(id__gt=request.GET["last_id"])
+                 .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS))
         ),
         content_type="application/json")
