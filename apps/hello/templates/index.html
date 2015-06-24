@@ -10,7 +10,11 @@
         <div class="page-header">
             <h2>
                 42 Coffee Cups Test Assignment
-                <small class="pull-right"><a href="{% url "login" %}">Login</a></small>
+                {% if user.is_authenticated %}
+                    <small class="pull-right"><a href="{% url "logout" %}?next=/">Log out</a></small>
+                {% else %}
+                    <small class="pull-right"><a href="{% url "login" %}?next=/">Login</a></small>
+                {% endif %}
             </h2>
         </div>
 
