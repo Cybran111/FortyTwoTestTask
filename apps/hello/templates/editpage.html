@@ -2,13 +2,13 @@
 {% extends "index.html" %}
 
 {% block person-info %}
-    <p> First name: {{ editform.firstname }}</p>
-    <p> Last name: {{ editform.lastname }}</p>
-    <p> Date of birth: {{ editform.birthdate }}</p>
+    <p> First name: {{ editform.first_name }}</p>
+    <p> Last name: {{ editform.last_name }}</p>
+    <p> Date of birth: {{ editform.birth_date }}</p>
 {% endblock %}
 
 {% block person-photo %}
-    <img src="{{ person.profile.photo.url }}" />
+    <img src="{{ editform.initial.photo.url }}" />
     {{ editform.photo }}
 {% endblock %}
 
@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block person-bio %}
-    {{ editform.bio|linebreaksbr }}
+    {{ editform.bio }}
 {% endblock %}
 
 {% block pre_content %}

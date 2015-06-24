@@ -28,6 +28,7 @@ class EditPersonPageTests(TestCase):
                               EditProfileForm)
 
     def test_editform_has_correct_initial_data(self):
+        """Checking if view provides correct initial data to the form"""
         person = Profile.objects.get(pk=1)
         self.assertDictEqual(
             self.response.context["editform"].initial,
@@ -47,6 +48,7 @@ class EditPersonFormTests(TestCase):
     }
 
     def test_form_has_correct_widgets(self):
+        """Checking form if it provides correct widget in some fields"""
         form = EditProfileForm()
         for field, widget in self.CORRECT_WIDGETS.iteritems():
             self.assertIsInstance(form.fields[field].widget, widget)
