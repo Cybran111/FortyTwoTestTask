@@ -11,10 +11,19 @@ class EditPersonPageTests(TestCase):
         self.client.login(username='admin', password='admin')
         self.response = self.client.get('/edit/')
 
-    def test_editpage_can_http_post(self):
-        """Is view serves POST request?"""
-        response = self.client.post('/edit/')
+    def test_editpage_accepts_POST_JSON(self):
+        """View should accept JSON POST request"""
+        response = self.client.post('/edit/',
+                                    {'some': 'data'},
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
+
+    def test_editpage_declines_POST_form_data(self):
+        """View should decline POST request with
+        multipart/form-data content type"""
+        response = self.client.post('/edit/',
+                                    {'some': 'data'})
+        self.assertEqual(response.status_code, 400)
 
     def test_editpage_correct_template(self):
         """Is view uses correct template?"""
