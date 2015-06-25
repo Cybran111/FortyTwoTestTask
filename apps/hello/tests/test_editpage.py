@@ -64,11 +64,7 @@ class EditPageAuthTests(TestCase):
 
 
 class EditPersonFormTests(TestCase):
-    ERROR_MESSAGES = {
-        "required": "This field is required.",
-        "invalid_date": "Enter a valid date.",
-        "invalid_email": "Enter a valid email address.",
-    }
+
     CORRECT_WIDGETS = {
         "bio": forms.Textarea,
         "contacts": forms.Textarea
@@ -89,8 +85,6 @@ class EditPersonFormTests(TestCase):
 
     def test_form_checks_data_incorrectness(self):
         """Testing form with invalid data"""
-        def assert_editform(field, error):
-            self.assertFormError(response, "editform", field, error)
 
         form_data = {
             'first_name': "",  # blank
@@ -108,13 +102,6 @@ class EditPersonFormTests(TestCase):
         response = self.client.post(reverse("editpage"),
                                     data=json.dumps(form_data),
                                     content_type='application/json')
-
-        assert_editform("first_name", self.ERROR_MESSAGES["required"])
-        assert_editform("last_name", self.ERROR_MESSAGES["required"])
-        assert_editform("birth_date", self.ERROR_MESSAGES["required"])
-        assert_editform("bio", self.ERROR_MESSAGES["required"])
-        assert_editform("email", self.ERROR_MESSAGES["required"])
-        assert_editform("jabber", self.ERROR_MESSAGES["required"])
-        assert_editform("skype", self.ERROR_MESSAGES["required"])
-        assert_editform("contacts", self.ERROR_MESSAGES["required"])
-        assert_editform("photo", self.ERROR_MESSAGES["required"])
+        for key in form_data:
+            self.assertFormError(response, "editform",
+                                 key, "This field is required.")
