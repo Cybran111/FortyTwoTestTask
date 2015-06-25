@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django import forms
@@ -104,13 +105,15 @@ class EditPersonFormTests(TestCase):
         }
 
         self.client.login(username='admin', password='admin')
-        response = self.client.post(reverse("editpage"), data=form_data)
+        response = self.client.post(reverse("editpage"),
+                                    data=json.dumps(form_data),
+                                    content_type='application/json')
 
         assert_editform("first_name", self.ERROR_MESSAGES["required"])
         assert_editform("last_name", self.ERROR_MESSAGES["required"])
-        assert_editform("birth_date", self.ERROR_MESSAGES["invalid_date"])
+        assert_editform("birth_date", self.ERROR_MESSAGES["required"])
         assert_editform("bio", self.ERROR_MESSAGES["required"])
-        assert_editform("email", self.ERROR_MESSAGES["invalid_email"])
+        assert_editform("email", self.ERROR_MESSAGES["required"])
         assert_editform("jabber", self.ERROR_MESSAGES["required"])
         assert_editform("skype", self.ERROR_MESSAGES["required"])
         assert_editform("contacts", self.ERROR_MESSAGES["required"])

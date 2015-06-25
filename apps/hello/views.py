@@ -34,7 +34,11 @@ def editpage(request):
     admin = User.objects.get(id=1)
     if request.user == admin:
         if request.method == 'POST':
-            editform = EditProfileForm(request.POST)
+            print
+            if request.META["CONTENT_TYPE"] == "application/json":
+                editform = EditProfileForm(request.POST)
+            else:
+                return HttpResponseBadRequest()
         else:
             editform = EditProfileForm(initial=admin.profile.to_dict())
 
