@@ -1,8 +1,11 @@
+from base64 import b64encode
 import json
+import StringIO
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
+from django.utils.image import Image
 from apps.hello.forms import EditProfileForm
 from apps.hello.models import Profile
 
@@ -19,9 +22,35 @@ class EditPersonPageTests(TestCase):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
+    def test_editpage_handle_B64_photo(self):
+        """View should handle JSON Base64 photo"""
+
+        # Create the file object with StringIO
+        img = Image.new("RGBA", size=(200, 200), color=(255, 0, 0, 0))
+        temp_handle = StringIO.StringIO()
+        img.save(temp_handle, 'png')
+        temp_handle.seek(0)
+
+        # Creating correct JSON representation of the model
+        person = Profile.objects.get(pk=1).to_dict()
+        person['photo'] = b64encode(temp_handle.read())
+        person['birth_date'] = person['birth_date'].strftime('%Y-%m-%d')
+        person_json = json.dumps(person)
+
+        self.client.post('/edit/', person_json,
+                         content_type='application/json')
+        updated_person = Profile.objects.get(pk=1)
+
+        # Checking if photos are equal
+        with open(updated_person.photo.path, 'r') as model_photo:
+            temp_handle.seek(0)
+            if temp_handle.read() != model_photo.read():
+                self.fail("Photos are not equal")
+
     def test_editpage_declines_POST_form_data(self):
         """View should decline POST request with
         multipart/form-data content type"""
+
         response = self.client.post('/edit/',
                                     {'some': 'data'})
         self.assertEqual(response.status_code, 400)
