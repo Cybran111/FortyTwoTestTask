@@ -1,3 +1,4 @@
+import json
 import logging
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -36,7 +37,8 @@ def editpage(request):
         if request.method == 'POST':
             print
             if request.META["CONTENT_TYPE"] == "application/json":
-                editform = EditProfileForm(request.POST)
+                post_data = json.loads(request.body)
+                editform = EditProfileForm(post_data)
             else:
                 return HttpResponseBadRequest()
         else:
