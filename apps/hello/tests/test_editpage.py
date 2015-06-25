@@ -39,7 +39,6 @@ class EditPersonPageTests(TestCase):
         person['photo'] = b64encode(temp_handle.read())
         person['birth_date'] = person['birth_date'].strftime('%Y-%m-%d')
         person_json = json.dumps(person)
-
         self.client.post('/edit/', person_json,
                          content_type='application/json')
         updated_person = Profile.objects.get(pk=1)
@@ -101,13 +100,14 @@ class EditPersonFormTests(TestCase):
         'jabber': ("", "required"),
         'skype': ("", "required"),
         'contacts': ("", "required"),
-        'photo': ("not an image", "required"),
+        'photo': ("not an image", "empty_image"),
     }
 
     ERROR_MESSAGES = {
         "required": "This field is required.",
         "invalid_date": "Enter a valid date.",
         "invalid_email": "Enter a valid email address.",
+        "empty_image": "The submitted file is empty.",
     }
 
     CORRECT_WIDGETS = {
