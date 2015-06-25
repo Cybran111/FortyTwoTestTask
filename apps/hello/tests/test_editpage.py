@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
@@ -8,10 +9,6 @@ from apps.hello.models import Profile
 class EditPersonPageTests(TestCase):
     def setUp(self):
         self.response = self.client.get('/edit/')
-
-    def test_editpage_exists(self):
-        """Is edit page accessable?"""
-        self.assertEqual(self.response.status_code, 200)
 
     def test_editpage_can_http_post(self):
         """Is view serves POST request?"""
@@ -34,6 +31,21 @@ class EditPersonPageTests(TestCase):
             self.response.context["editform"].initial,
             person.to_dict()
         )
+
+
+class EditPageAuthTests(TestCase):
+    def test_admin_can_access(self):
+        """Admin can asks for edit page"""
+        self.client.login(username='admin', password='admin')
+        response = self.client.get("/edit/")
+        self.assertEqual(200, response.status_code)
+
+    def test_user_hasnt_access(self):
+        """User cannot access edit page?"""
+        User.objects.create_user('temporary', 'temporary@example.com', 'temporary')
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get("/edit/")
+        self.assertEqual(400, response.status_code)
 
 
 class EditPersonFormTests(TestCase):

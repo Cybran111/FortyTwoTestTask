@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from apps.hello.models import Profile
 
@@ -53,3 +54,8 @@ class AuthPagesTests(TestCase):
         """Is logout page accessable?"""
         response = self.client.get("/accounts/logout/")
         self.assertEqual(response.status_code, 200)
+
+    def test_redirect_admin_to_editpage(self):
+        self.client.login(username='admin', password='admin')
+        response = self.client.get('/')
+        self.assertRedirects(response, reverse("editpage"))
