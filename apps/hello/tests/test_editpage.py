@@ -8,6 +8,7 @@ from apps.hello.models import Profile
 
 class EditPersonPageTests(TestCase):
     def setUp(self):
+        self.client.login(username='admin', password='admin')
         self.response = self.client.get('/edit/')
 
     def test_editpage_can_http_post(self):
@@ -41,8 +42,12 @@ class EditPageAuthTests(TestCase):
         self.assertEqual(200, response.status_code)
 
     def test_user_hasnt_access(self):
-        """User cannot access edit page?"""
-        User.objects.create_user('temporary', 'temporary@example.com', 'temporary')
+        """User cannot access edit page"""
+        User.objects.create_user(
+            'temporary',
+            'temporary@example.com',
+            'temporary'
+        )
         self.client.login(username='temporary', password='temporary')
         response = self.client.get("/edit/")
         self.assertEqual(400, response.status_code)
@@ -88,6 +93,8 @@ class EditPersonFormTests(TestCase):
             'contacts': "",  # blank
             'photo': "not an image",
         }
+
+        self.client.login(username='admin', password='admin')
         response = self.client.post(reverse("editpage"), data=form_data)
 
         assert_editform("first_name", self.ERROR_MESSAGES["required"])

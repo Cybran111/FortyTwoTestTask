@@ -56,6 +56,7 @@ class AuthPagesTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_admin_to_editpage(self):
+        """Homepage should redirect admin to editpage"""
         self.client.login(username='admin', password='admin')
-        response = self.client.get('/')
+        response = self.client.get('/', follow=True)
         self.assertRedirects(response, reverse("editpage"))
