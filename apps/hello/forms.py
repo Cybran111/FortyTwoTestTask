@@ -3,7 +3,7 @@ from django.forms import forms, CharField, DateField, \
 
 
 class PhotoInput(ClearableFileInput):
-    template_with_initial = '%(initial_text)s: %(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
+    template_with_initial = u'%(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
     url_markup_template = '<img src="{0}" alt="{1}" class="img-thumbnail"/>'
 
 
