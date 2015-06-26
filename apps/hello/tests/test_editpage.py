@@ -153,7 +153,8 @@ class EditPersonFormTests(TestCase):
 
     CORRECT_WIDGETS = {
         "bio": forms.Textarea,
-        "contacts": forms.Textarea
+        "contacts": forms.Textarea,
+        "photo": PhotoInput
     }
 
     def test_form_has_correct_widgets(self):

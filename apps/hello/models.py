@@ -12,7 +12,7 @@ class Profile(models.Model):
     skype = models.TextField()
     photo = ResizedImageField(size=[200, 200],
                               upload_to="pictures/",
-                              default="pictures/notfound.jpg")
+                              default="pictures/notfound.png")
 
     def to_dict(self):
         return {
