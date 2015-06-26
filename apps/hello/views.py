@@ -52,7 +52,7 @@ def editpage(request):
                         datatype = m.group('datatype')
                         temp_img.write(b64decode(m.group("data")))
                         temp_img.seek(0)
-                        img = ImageFile(temp_img, "admin"+datatype)
+                        img = ImageFile(temp_img, "admin")
                     else:
                         img = ImageFile("", "dumbname")
                 else:
@@ -70,7 +70,7 @@ def editpage(request):
                     person.user.skype = data['skype']
                     person.contacts = data['contacts']
                     if img != admin.profile.photo:
-                        person.photo.save("photo.png", img)
+                        person.photo.save("photo."+datatype, img)
                     person.save()
                     return HttpResponse()
 

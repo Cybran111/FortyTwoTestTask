@@ -9,7 +9,7 @@ from django.test import TestCase
 
 from django.utils.image import Image
 
-from apps.hello.forms import EditProfileForm
+from apps.hello.forms import EditProfileForm, PhotoInput
 from apps.hello.models import Profile
 
 
