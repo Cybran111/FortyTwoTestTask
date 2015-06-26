@@ -242,7 +242,8 @@
     "user": 1, 
     "skype": "cybran111", 
     "birth_date": "1995-04-22", 
-    "jabber": "cybran@42cc.co"
+    "jabber": "cybran@42cc.co",
+    "photo": "pictures/notfound.png"
   }
 }
 ]

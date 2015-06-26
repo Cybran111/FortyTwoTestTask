@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from apps.hello.models import Profile
 
@@ -36,3 +37,26 @@ class HomePageTests(TestCase):
 
         self.assertEqual(User.objects.get(username="admin"),
                          self.response.context["person"])
+
+
+class AuthPagesTests(TestCase):
+    def test_loginpage_exists(self):
+        """Is login page accessable?"""
+        response = self.client.get("/accounts/login/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_loginpage_uses_correct_template(self):
+        """Is login page accessable?"""
+        response = self.client.get("/accounts/login/")
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_logoutpage_exists(self):
+        """Is logout page accessable?"""
+        response = self.client.get("/accounts/logout/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirect_admin_to_editpage(self):
+        """Homepage should redirect admin to editpage"""
+        self.client.login(username='admin', password='admin')
+        response = self.client.get('/', follow=True)
+        self.assertRedirects(response, reverse("editpage"))
