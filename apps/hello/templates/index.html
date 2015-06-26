@@ -3,15 +3,24 @@
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'hello/css/hello.css' %}"/>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
 {% endblock %}
 
-{#{% block body_class %}container-fluid{% endblock %}#}
-
 {% block content %}
-
     <div class="container-fluid">
-    <h2>42 Coffee Cups Test Assignment</h2>
+        <div class="page-header">
+            <h2>
+                42 Coffee Cups Test Assignment
+                {% if user.is_authenticated %}
+                    <small class="pull-right"><a href="{% url "logout" %}?next=/">Log out</a></small>
+                {% else %}
+                    <small class="pull-right"><a href="{% url "login" %}?next=/">Login</a></small>
+                {% endif %}
+            </h2>
+        </div>
+
+        {% block pre_content %}
+
+        {% endblock %}
         <div class="col-md-6">
 
             <div class="panel panel-default">
@@ -19,18 +28,22 @@
                     <h3 class="panel-title">Common</h3>
                 </div>
                 <div class="panel-body">
-                    <p> First name: {{ person.first_name }}</p>
-                    <p> Last name: {{ person.last_name }}</p>
-                    <p> Date of birth: {{ person.profile.birth_date }}</p>
+                    {% block person-info %}
+                        <p> First name: {{ person.first_name }}</p>
+                        <p> Last name: {{ person.last_name }}</p>
+                        <p> Date of birth: {{ person.profile.birth_date }}</p>
+                    {% endblock %}
                 </div>
             </div>
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Biography</h3>
+                    <h3 class="panel-title">Photo</h3>
                 </div>
                 <div class="panel-body">
-                    {{ person.profile.bio|linebreaksbr }}
+                    {% block person-photo %}
+                        <img src="{{ person.profile.photo.url }}" />
+                    {% endblock %}
                 </div>
             </div>
 
@@ -41,9 +54,11 @@
                     <h3 class="panel-title">Contacts</h3>
                 </div>
                 <div class="panel-body">
-                    <p>Email: {{ person.email }}</p>
-                    <p>Jabber: {{ person.profile.jabber }}</p>
-                    <p>Skype: {{ person.profile.skype }}</p>
+                    {% block person-generalcontacts %}
+                        <p>Email: {{ person.email }}</p>
+                        <p>Jabber: {{ person.profile.jabber }}</p>
+                        <p>Skype: {{ person.profile.skype }}</p>
+                    {% endblock %}
                 </div>
             </div>
 
@@ -52,15 +67,33 @@
                 <h3 class="panel-title">Other contacts</h3>
               </div>
               <div class="panel-body">
+                  {% block person-othercontacts %}
                     <p> {{ person.profile.contacts }} </p>
+                  {% endblock %}
               </div>
             </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Biography</h3>
+                </div>
+                <div class="panel-body">
+                    {% block person-bio %}
+                        {{ person.profile.bio|linebreaksbr }}
+                    {% endblock %}
+                </div>
+            </div>
         </div>
+
+        {% block post_content %}
+
+        {% endblock %}
     </div>
 
     <footer id="footer">
-        <hr />
-        <a href="{% url "requests" %}"> Requests </a>
+        <div id="request-container">
+            <a href="{% url "requests" %}"> Requests </a>
+        </div>
     </footer>
 
 {% endblock %}

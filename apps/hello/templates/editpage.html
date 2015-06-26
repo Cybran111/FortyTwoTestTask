@@ -1,0 +1,61 @@
+{% extends "index.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker3.min.css' %}"/>
+    <script src="{% static "js/jquery.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/jquery.form.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/bootstrap.min.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/bootstrap-datepicker.min.js" %}" type="text/javascript"></script>
+    <script src="{% static "hello/js/editperson.js" %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block person-info %}
+    <p> First name: {{ editform.first_name }}</p>
+    <p> Last name: {{ editform.last_name }}</p>
+    <p> Date of birth: {{ editform.birth_date }}</p>
+{% endblock %}
+
+{% block person-photo %}
+    {{ editform.photo }}
+{% endblock %}
+
+{% block person-generalcontacts %}
+    <p>Email: {{ editform.email }}</p>
+    <p>Jabber: {{ editform.jabber }}</p>
+    <p>Skype: {{ editform.skype }}</p>
+{% endblock %}
+
+{% block person-othercontacts %}
+    <p> {{ editform.contacts }} </p>
+{% endblock %}
+
+{% block person-bio %}
+    {{ editform.bio }}
+{% endblock %}
+
+{% block pre_content %}
+<form id="editform" class="form-horizontal" method="post">
+    {% csrf_token %}
+{% endblock %}
+
+{% block post_content %}
+    <div class="col-md-6">
+            <div id="progress-wrap" class="progress progress-striped hidden">
+              <div id="progress-bar" class="progress-bar progress-bar-success"
+                   role="progressbar"
+                   aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                  <div id="percent"></div>
+              </div>
+            </div>
+            <div id="form-status" class="hidden">
+                Changes have been saved
+            </div>
+
+        <input type="submit" class="btn btn-default" value="Submit">
+        <a class="btn">Cancel</a>
+    </div>
+    </form>
+
+{% endblock %}
