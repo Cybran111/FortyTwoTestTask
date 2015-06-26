@@ -4,19 +4,48 @@
 
 $(document).ready(function () {
 
+    var Base64 = {
+
+    _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+
+    _utf8_encode: function(string) {
+        string = string.replace(/\r\n/g, "\n");
+        var utftext = "";
+
+        for (var n = 0; n < string.length; n++) {
+
+            var c = string.charCodeAt(n);
+
+            if (c < 128) {
+                utftext += String.fromCharCode(c);
+            }
+            else if ((c > 127) && (c < 2048)) {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+            else {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+
+        }
+
+        return utftext;
+    }
+};
+
+
     var bar = $('#progress-bar');
     var percent = $('#percent');
     var status = $('#form-status');
     var progressWrap = $("#progress-wrap");
     var editform = $('#editform');
-    var submit_button = editform.find(":input[type='submit']");
-    console.log(submit_button);
-
 
     function startUpload() {
         var csrftoken = data["csrfmiddlewaretoken"];
         delete data["csrfmiddlewaretoken"];
-        data["photo"] = btoa(fr.result);
+        data["photo"] = Base64._utf8_encode(fr.result);
 
         $.ajax({
             url: "",

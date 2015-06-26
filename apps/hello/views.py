@@ -1,7 +1,7 @@
 from base64 import b64decode
 import json
 import logging
-import StringIO
+import re
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import serializers
@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect
+from io import BytesIO
 from apps.hello.forms import EditProfileForm
 import settings as hello_settings
 from apps.hello.models import Request, Profile
@@ -38,32 +39,38 @@ def editpage(request):
     admin = User.objects.get(id=1)
     if request.user == admin:
         if request.method == 'POST':
-            print
-            if request.META["CONTENT_TYPE"] == "application/json":
+            if "application/json" in request.META["CONTENT_TYPE"]:
                 post_data = json.loads(request.body)
+                temp_img = BytesIO()
 
-                temp_img = StringIO.StringIO()
-                try:
-                    # temp_img.write(post_data["photo"].decode('base64'))
-                    temp_img.write(b64decode(post_data["photo"]))
-                    del post_data["photo"]
+                if post_data.get("photo", None):
+                    m = re.search(
+                        r"data:image/(?P<datatype>.+);base64,(?P<data>.+)",
+                        post_data["photo"],
+                        re.M)
+                    if m:
+                        datatype = m.group('datatype')
+                        temp_img.write(b64decode(m.group("data")))
+                        temp_img.seek(0)
+                        img = ImageFile(temp_img, "admin"+datatype)
+                    else:
+                        img = ImageFile("", "dumbname")
+                else:
+                    img = admin.profile.photo
 
-                except (KeyError, TypeError) as e:
-                    logger.debug(u"Got a Base64 photo error while parsing: %s" % e)
-                    temp_img.write("")
-                temp_img.seek(0)
-                img = ImageFile(temp_img, "dumbname")
                 editform = EditProfileForm(post_data, files={"photo": img})
                 if editform.is_valid():
+                    data = editform.cleaned_data
                     person = Profile.objects.get(id=1)
-                    person.user.first_name = editform.cleaned_data['first_name']
-                    person.user.last_name = editform.cleaned_data['last_name']
-                    person.bio = editform.cleaned_data['bio']
-                    person.user.email = editform.cleaned_data['email']
-                    person.jabber = editform.cleaned_data['jabber']
-                    person.user.skype = editform.cleaned_data['skype']
-                    person.contacts = editform.cleaned_data['contacts']
-                    person.photo = editform.cleaned_data['photo']
+                    person.user.first_name = data['first_name']
+                    person.user.last_name = data['last_name']
+                    person.bio = data['bio']
+                    person.user.email = data['email']
+                    person.jabber = data['jabber']
+                    person.user.skype = data['skype']
+                    person.contacts = data['contacts']
+                    if img != admin.profile.photo:
+                        person.photo.save("photo.png", img)
                     person.save()
                     return HttpResponse()
 
