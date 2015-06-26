@@ -3,8 +3,9 @@ from django.forms import forms, CharField, DateField, \
 
 
 class PhotoInput(ClearableFileInput):
-    template_with_initial = u'%(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
-    url_markup_template = '<img src="{0}" alt="{1}" class="img-thumbnail"/>'
+    template_with_initial = u'%(initial)s %(clear_template)s' \
+                            u'<br />%(input_text)s: %(input)s'
+    url_markup_template = u'<img src="{0}" alt="{1}" class="img-thumbnail"/>'
 
 
 class EditProfileForm(forms.Form):

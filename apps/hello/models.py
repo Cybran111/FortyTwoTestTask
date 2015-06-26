@@ -11,7 +11,7 @@ class Profile(models.Model):
     jabber = models.TextField()
     skype = models.TextField()
     photo = ResizedImageField(size=[200, 200],
-                              upload_to="pictures/",
+                              upload_to="hello/photos",
                               default="pictures/notfound.png")
 
     def to_dict(self):
