@@ -8,7 +8,7 @@ from django.core import serializers
 from django.core.files.images import ImageFile
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from io import BytesIO
 from apps.hello.forms import EditProfileForm
 import settings as hello_settings
