@@ -11,6 +11,7 @@
             <h2>
                 42 Coffee Cups Test Assignment
                 {% if user.is_authenticated %}
+                <small class="pull-right"><a href="{% url "editpage" %}">Edit</a></small>
                     <small class="pull-right"><a href="{% url "logout" %}?next=/">Log out</a></small>
                 {% else %}
                     <small class="pull-right"><a href="{% url "login" %}?next=/">Login</a></small>
