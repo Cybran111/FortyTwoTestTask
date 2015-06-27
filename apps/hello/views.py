@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.files.images import ImageFile
-from django.core.urlresolvers import reverse
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect
@@ -22,10 +21,6 @@ def homepage(request):
     logger.info(u"Accessed homepage by %s on %s route"
                 % (request.method, request.path))
     person = User.objects.get(pk=1)
-
-    if request.user == person:
-        return redirect(reverse("editpage"))
-
     logger.debug(u"Returned User object %s with next data: {%s}"
                  % (person,
                     u", ".join(u"'{0}': '{1}'".format(k, v)
