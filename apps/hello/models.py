@@ -35,3 +35,9 @@ class Request(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class DbAction(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    action = models.TextField()
+    model_object = models.TextField()
