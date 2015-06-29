@@ -6,6 +6,21 @@ import sys
 
 
 class CommandGetModelsTests(TestCase):
+
+    @staticmethod
+    def seek_start():
+        sys.stdout.seek(0)
+        sys.stderr.seek(0)
+
+    class SwapOutput(object):
+        def __enter__(self):
+            self.out, sys.stdout = sys.stdout, StringIO()
+            self.err, sys.stderr = sys.stderr, StringIO()
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            sys.stdout = self.out
+            sys.stderr = self.err
+
     def test_getmodels_returns_all_models_data(self):
         """getmodels should return all models
         line by line and objects count in them"""
@@ -21,13 +36,11 @@ class CommandGetModelsTests(TestCase):
                          for model in model_list]
 
         expected_result = '\n'.join(expected_list)+'\n'
-        out, sys.stdout = sys.stdout, StringIO()
-        call_command('getmodels')
 
-        sys.stdout.seek(0)
-
-        actual_result = unicode(sys.stdout.read())
-        sys.stdout = out
+        with self.SwapOutput():
+            call_command('getmodels')
+            self.seek_start()
+            actual_result = unicode(sys.stdout.read())
 
         self.assertEqual(expected_result, actual_result)
 
@@ -35,17 +48,11 @@ class CommandGetModelsTests(TestCase):
         """Command should dublicate stdout to stderr
         Command should prepend 'error: ' to stderr output
         """
-        out, sys.stdout = sys.stdout, StringIO()
-        err, sys.stderr = sys.stderr, StringIO()
+        with self.SwapOutput():
+            call_command('getmodels')
 
-        call_command('getmodels')
+            self.seek_start()
 
-        sys.stdout.seek(0)
-        sys.stderr.seek(0)
-
-        for stdout_line, stdrerr_line in zip(sys.stdout.readlines(),
-                                             sys.stderr.readlines()):
-            self.assertEqual("error: %s" % stdout_line, stdrerr_line)
-
-        sys.stdout = out
-        sys.stderr = err
+            for stdout_line, stdrerr_line in zip(sys.stdout.readlines(),
+                                                 sys.stderr.readlines()):
+                self.assertEqual("error: %s" % stdout_line, stdrerr_line)

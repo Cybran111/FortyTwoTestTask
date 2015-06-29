@@ -6,7 +6,7 @@ from apps.hello.models import DbAction
 
 @receiver(post_save)
 def db_save_callback(sender, instance, created, **kwargs):
-    if sender == DbAction:
+    if sender == DbAction:  # We don't wanna fall into recursion, huh?
         return
 
     action = "create" if created else "update"
