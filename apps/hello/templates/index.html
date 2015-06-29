@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load admin_tags %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'hello/css/footer.css' %}"/>
@@ -10,14 +11,15 @@
         <div class="page-header">
             <h2>
                 42 Coffee Cups Test Assignment
-                {% if user.is_authenticated %}
-                    <div class="pull-right">
+                <div class="pull-right">
+                    {% if user.is_authenticated %}
                         <small><a href="{% url "editpage" %}">Edit</a></small>
+                        <small><a href="{% editlink person %}">(admin)</a></small>
                         <small><a href="{% url "logout" %}?next=/">Log out</a></small>
-                    </div>
-                {% else %}
-                    <small class="pull-right"><a href="{% url "login" %}?next=/">Login</a></small>
-                {% endif %}
+                    {% else %}
+                        <small><a href="{% url "login" %}?next=/">Login</a></small>
+                    {% endif %}
+                </div>
             </h2>
         </div>
 

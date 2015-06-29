@@ -74,7 +74,8 @@ def editpage(request):
         else:
             editform = EditProfileForm(initial=admin.profile.to_dict())
 
-        return render(request, "editpage.html", {"editform": editform})
+        return render(request, "editpage.html", {"person": admin,
+                                                 "editform": editform})
     else:
         return HttpResponseBadRequest()
 

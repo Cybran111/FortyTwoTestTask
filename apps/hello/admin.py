@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.hello.models import Profile, Request
+from apps.hello.models import Profile, Request, DbAction
 # Register your models here.
 
 
@@ -14,3 +14,4 @@ class ProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Request)
+admin.site.register(DbAction)
