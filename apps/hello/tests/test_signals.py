@@ -8,13 +8,15 @@ from apps.hello.models import DbAction, Profile
 
 
 class DbActionSignalTests(TestCase):
+    def setUp(self):
+        self.dbaction_count = DbAction.objects.count()
 
     def test_signal_catches_create(self):
         """db_action signal should catch creation of any model entry"""
 
         # some foreign model such as auth.user
         user = User.objects.create_user("dumb", "user@example.com", "user")
-        self.assertEqual(1, DbAction.objects.count())
+        self.assertEqual(self.dbaction_count + 1, DbAction.objects.count())
 
         img = Image.new("RGBA", size=(200, 200), color=(255, 0, 0, 0))
         temp_handle = StringIO.StringIO()
@@ -26,7 +28,7 @@ class DbActionSignalTests(TestCase):
                                bio="bio", contacts="contacts",
                                jabber="jab", skype="sky",
                                photo=ContentFile(temp_handle.read()))
-        self.assertEqual(2, DbAction.objects.count())
+        self.assertEqual(self.dbaction_count + 2, DbAction.objects.count())
 
     def test_signal_catches_update(self):
         """db_action signal should catch updating of any model entry"""
@@ -35,13 +37,13 @@ class DbActionSignalTests(TestCase):
         user = User.objects.get(id=1)
         user.first_name = "Somebody"
         user.save()
-        self.assertEqual(1, DbAction.objects.count())
+        self.assertEqual(self.dbaction_count+1, DbAction.objects.count())
 
         # some local model
         profile = Profile.objects.get(id=1)
         profile.bio = "Such a biography"
         profile.save()
-        self.assertEqual(2, DbAction.objects.count())
+        self.assertEqual(self.dbaction_count+2, DbAction.objects.count())
 
     def test_signal_catches_delete(self):
         """db_action signal should catch deletion of any model entry"""
@@ -49,9 +51,9 @@ class DbActionSignalTests(TestCase):
         # some local model
         profile = Profile.objects.get(id=1)
         profile.delete()
-        self.assertEqual(1, DbAction.objects.count())
+        self.assertEqual(self.dbaction_count+1, DbAction.objects.count())
 
         # some foreign model such as auth.user
         user = User.objects.get(id=1)
         user.delete()
-        self.assertEqual(2, DbAction.objects.count())
+        self.assertEqual(self.dbaction_count+2, DbAction.objects.count())
