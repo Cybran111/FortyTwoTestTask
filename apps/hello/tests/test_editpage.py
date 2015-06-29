@@ -38,7 +38,8 @@ class EditPersonPageTests(TestCase):
 
     def test_editpage_context_correct(self):
         """Is view provides correct context?"""
-        self.assertEqual(User.objects.get(pk=1), self.response.context["person"])
+        self.assertEqual(User.objects.get(pk=1),
+                         self.response.context["person"])
         self.assertIsInstance(self.response.context["editform"],
                               EditProfileForm)
 
