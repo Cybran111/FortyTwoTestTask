@@ -32,7 +32,9 @@ class CommandGetModelsTests(TestCase):
         self.assertEqual(expected_result, actual_result)
 
     def test_getmodels_dublicates_stdout_to_stderr(self):
-        """Command should dublicate stdout to stderr"""
+        """Command should dublicate stdout to stderr
+        Command should prepend 'error: ' to stderr output
+        """
         out, sys.stdout = sys.stdout, StringIO()
         err, sys.stderr = sys.stderr, StringIO()
 
@@ -41,22 +43,9 @@ class CommandGetModelsTests(TestCase):
         sys.stdout.seek(0)
         sys.stderr.seek(0)
 
-        self.assertEqual(sys.stdout.read(), sys.stderr.read())
+        for stdout_line, stdrerr_line in zip(sys.stdout.readlines(),
+                                             sys.stderr.readlines()):
+            self.assertEqual("error: %s" % stdout_line, stdrerr_line)
 
         sys.stdout = out
         sys.stderr = err
-
-    def test_getmodels_prepend_text_to_stderr(self):
-        """Command should dublicate stdout to stderr"""
-        out, sys.stdout = sys.stdout, StringIO()
-        err, sys.stderr = sys.stderr, StringIO()
-
-        call_command('getmodels')
-        sys.stderr.seek(0)
-
-        for line in sys.stderr.readlines():
-            self.assertTrue(line.startswith("error: "))
-
-        sys.stdout = out
-        sys.stderr = err
-
