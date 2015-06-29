@@ -3,8 +3,6 @@ from django.db import models
 
 
 class Command(BaseCommand):
-    args = '<poll_id poll_id ...>'
-    help = 'Closes the specified poll for voting'
 
     def handle(self, *args, **options):
         for model in models.get_models(include_auto_created=True):
