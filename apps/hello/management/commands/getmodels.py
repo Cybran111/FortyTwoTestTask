@@ -11,4 +11,4 @@ class Command(BaseCommand):
                                          model.objects.count())
 
             self.stdout.write(model_info)
-            self.stderr.write(model_info)
+            self.stderr.write("error: %s" % model_info)
