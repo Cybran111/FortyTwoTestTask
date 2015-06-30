@@ -17,7 +17,32 @@ $( document ).ready(function() {
         4: $(".request[priority='4']").last(),
         5: $(".request[priority='5']").last()
     };
-    console.log(position_table);
+
+    var priorityform =$('#set-priority');
+
+    function updatePriority() {
+        priorityform.find("input[name='request']").val(
+            $(this).parents(".request").attr("id")
+        );
+        priorityform.find("input[name='priority']").val(
+            $(this).siblings("input[type='number']").attr("value")
+        );
+        console.log(priorityform);
+        priorityform.submit()
+    }
+
+    function showHidePriorityEdit() {
+        var target = $(this).siblings("div");
+        console.log(target);
+        if (target.hasClass("hidden")){
+            target.removeClass("hidden")
+        } else {
+            target.addClass("hidden")
+        }
+    }
+
+    $(".priority-edit").click(showHidePriorityEdit);
+    $(".post-priority").click(updatePriority);
 
     window.onfocus = function () {
         isActive = true;
@@ -51,6 +76,8 @@ $( document ).ready(function() {
                     $(newRow).attr('id', value.pk);
                     $(newRow).attr('priority', priority);
 
+                    // FIXME: it will never insert low-priority el
+                    // to the table if there are no lower priority elements
                     for (var i = priority; i >= 1; i--){
                         if (position_table[i].length != 0) {
                             position_table[i].after(newRow);
@@ -66,5 +93,6 @@ $( document ).ready(function() {
 
     updateTable();
     setInterval(updateTable, updateInterval);
+
 
 });
