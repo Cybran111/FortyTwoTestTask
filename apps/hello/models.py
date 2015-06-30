@@ -14,6 +14,15 @@ class Profile(models.Model):
                               upload_to="hello/photos",
                               default="pictures/notfound.png")
 
+    def update_user(self, data):
+        self.user.first_name = data['first_name']
+        self.user.last_name = data['last_name']
+        self.bio = data['bio']
+        self.user.email = data['email']
+        self.jabber = data['jabber']
+        self.skype = data['skype']
+        self.contacts = data['contacts']
+
     def to_dict(self):
         return {
             "first_name": self.user.first_name,

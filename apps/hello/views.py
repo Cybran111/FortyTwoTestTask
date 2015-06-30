@@ -7,12 +7,13 @@ from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.files.images import ImageFile
 from django.forms import model_to_dict
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest,\
+    HttpResponseForbidden
 from django.shortcuts import render
 from io import BytesIO
 from apps.hello.forms import EditProfileForm
 import settings as hello_settings
-from apps.hello.models import Request, Profile
+from apps.hello.models import Request
 
 logger = logging.getLogger(__name__)
 
@@ -32,52 +33,55 @@ def homepage(request):
 @login_required
 def editpage(request):
     admin = User.objects.get(id=1)
-    if request.user == admin:
-        if request.method == 'POST':
-            if "application/json" in request.META["CONTENT_TYPE"]:
-                post_data = json.loads(request.body)
-                temp_img = BytesIO()
+    if request.user != admin:
+        return HttpResponseForbidden("Only admin can access this page.")
 
-                if post_data.get("photo", None):
-                    m = re.search(
-                        r"data:image/(?P<datatype>.+);base64,(?P<data>.+)",
-                        post_data["photo"],
-                        re.M)
-                    if m:
-                        datatype = m.group('datatype')
-                        temp_img.write(b64decode(m.group("data")))
-                        temp_img.seek(0)
-                        img = ImageFile(temp_img, "admin")
-                    else:
-                        img = ImageFile("", "dumbname")
-                else:
-                    img = admin.profile.photo
+    if request.method == 'POST':
+        if "application/json" not in request.META["CONTENT_TYPE"]:
+            return HttpResponseBadRequest()
 
-                editform = EditProfileForm(post_data, files={"photo": img})
-                if editform.is_valid():
-                    data = editform.cleaned_data
-                    person = Profile.objects.get(id=1)
-                    person.user.first_name = data['first_name']
-                    person.user.last_name = data['last_name']
-                    person.bio = data['bio']
-                    person.user.email = data['email']
-                    person.jabber = data['jabber']
-                    person.user.skype = data['skype']
-                    person.contacts = data['contacts']
-                    if img != admin.profile.photo:
-                        person.photo.save("photo."+datatype, img)
-                    person.save()
-                    return HttpResponse()
+        post_data = json.loads(request.body)
+        img, datatype = get_photo(post_data)
 
-            else:
-                return HttpResponseBadRequest()
-        else:
-            editform = EditProfileForm(initial=admin.profile.to_dict())
+        editform = EditProfileForm(post_data, files={
+            "photo": img or admin.profile.photo
+        })
 
-        return render(request, "editpage.html", {"person": admin,
-                                                 "editform": editform})
+        if editform.is_valid():
+            admin.profile.update_user(editform.cleaned_data)
+            if img:
+                admin.profile.photo.save("photo.%s" % datatype, img)
+            admin.save()
+            return HttpResponse()
     else:
-        return HttpResponseBadRequest()
+        editform = EditProfileForm(initial=admin.profile.to_dict())
+
+    return render(request, "editpage.html", {"person": admin,
+                                             "editform": editform})
+
+
+def get_photo(data):
+    encoded_photo = data.get("photo", None)
+    if not encoded_photo:
+        return None, None
+    return parse_b64_photo(data["photo"])
+
+
+def parse_b64_photo(encoded_photo):
+    temp_img = BytesIO()
+    parsed_photo = re.search(
+        r"data:image/(?P<datatype>.+);base64,(?P<data>.+)",
+        encoded_photo,
+        re.M)
+    datatype = ""
+    if parsed_photo:
+        datatype = parsed_photo.group('datatype')
+        temp_img.write(b64decode(parsed_photo.group("data")))
+        temp_img.seek(0)
+        img = ImageFile(temp_img, "admin")
+    else:
+        img = ImageFile("", "empty_photo")
+    return img, datatype
 
 
 def requests(request):

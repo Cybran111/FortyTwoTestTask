@@ -128,7 +128,8 @@ class EditPageAuthTests(TestCase):
                                  'temporary')
         self.client.login(username='temporary', password='temporary')
         response = self.client.get("/edit/")
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(403, response.status_code)
+        self.assertEqual("Only admin can access this page.", response.content)
 
 
 class EditPersonFormTests(TestCase):
