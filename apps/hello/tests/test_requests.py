@@ -27,29 +27,40 @@ class RequestsPageTests(TestCase):
         Requests page shouldn't contains requests
         that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""
         self.assertListEqual(
-            list(Request.objects.order_by("created_at", "priority")
+            list(Request.objects.order_by("-priority", "-created_at")
                  .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
                  [:hello_settings.MAX_REQUESTS]),
             list(self.response.context["requests"])
         )
 
+
 class RequestModelTests(TestCase):
+    fixtures = ["requests.json"]
     DEFAULT_VALUES = {"method": "GET", "path": "/"}
 
     def test_model_denies_priority_lte_zero(self):
-        with self.assertRaises(ValidationError):
-            for value in xrange(0, -100, -1):
+        """Model should raise ValidationError if priority <= 0"""
+        for value in xrange(0, -100, -1):
+            with self.assertRaises(ValidationError):
                 Request.objects.create(priority=value, **self.DEFAULT_VALUES)
 
     def test_model_denies_priority_gte_6(self):
-        with self.assertRaises(ValidationError):
-            for value in xrange(6, 100):
+        """Model should raise ValidationError if priority <= 6"""
+        for value in xrange(6, 100):
+            with self.assertRaises(ValidationError):
                 Request.objects.create(priority=value, **self.DEFAULT_VALUES)
 
     def test_model_accepts_priority_one_to_five(self):
+        """Model should accept any value between 1 and 5"""
         for value in xrange(1, 6):
-            request = Request.objects.create(priority=value, **self.DEFAULT_VALUES)
+            request = Request.objects.create(priority=value,
+                                             **self.DEFAULT_VALUES)
             self.assertEqual(request.priority, value)
+
+    def test_model_priority_default_is_three(self):
+        """Model should use 3 as default value"""
+        request = Request.objects.create(**self.DEFAULT_VALUES)
+        self.assertEqual(request.priority, 3)
 
 
 class RequestMiddlewareTests(TestCase):
@@ -103,7 +114,7 @@ class RequestsListTest(TestCase):
 
         requests = serializers.serialize(
             'json',
-            list(Request.objects.order_by("created_at", "priority")
+            list(Request.objects.order_by("-priority", "-created_at")
                  .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
                  [LAST_ITEM_ID:])
         )

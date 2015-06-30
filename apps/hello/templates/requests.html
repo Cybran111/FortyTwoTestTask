@@ -12,15 +12,19 @@
 {% block content %}
     <table class="table table-bordered">
       <tr id="table-header">
+        <th>#</th>
         <th>Created</th>
         <th>Method</th>
         <th>Path</th>
+        <th>Priority</th>
       </tr>
           {% for request in requests %}
-          <tr class="request" id="{{ request.id }}">
+          <tr class="request" id="{{ request.id }}" priority="{{ request.priority }}">
+            <td class="request-id"> {{ request.id }} </td>
             <td class="request-createdat"> {{ request.created_at }} </td>
             <td class="request-method"> {{ request.method }} </td>
-            <td class="request-path"> {{ request.path }} </td>
+              <td class="request-path"> {{ request.path }} </td>
+              <td class="request-priority"> {{ request.priority }} </td>
           </tr>
           {% endfor %}
     </table>

@@ -7,9 +7,17 @@ $( document ).ready(function() {
     var updateInterval = 5000;
     var isActive;
     var clonedRequestRow = $(".request").last().clone();
-    var last_id = $(clonedRequestRow).attr('id');
+    var last_count = $(".request").length;
     var missedRequests = 0;
     var newRow, newDom;
+    var position_table = {
+        1: $(".request[priority='1']").first(),
+        2: $(".request[priority='2']").first(),
+        3: $(".request[priority='3']").first(),
+        4: $(".request[priority='4']").first(),
+        5: $(".request[priority='5']").first()
+    };
+    console.log(position_table);
 
     window.onfocus = function () {
         isActive = true;
@@ -22,27 +30,29 @@ $( document ).ready(function() {
     };
 
     function updateTable () {
-        $.getJSON("list/", {"last_id": last_id}, function (data) {
+        $.getJSON("list/", {"last_count": last_count}, function (data) {
 
-            if (data.length != 0) {
-                if (!isActive) {
-                    missedRequests = missedRequests + data[data.length - 1].pk - last_id;
+            last_count = last_count+data.length;
+            if (data.length != 0 && !isActive) {
+                    missedRequests = missedRequests + data.length;
                     document.title = "(" + missedRequests + ") " + initialTitle;
-                }
-                last_id = data[data.length-1].pk;
             }
-            $.each(data, function (key, value) {
+            $.each(data.reverse(), function (key, value) {
                     newRow = clonedRequestRow.clone();
                     newDom = $(newRow).get(0);
-
+                    var priority = value.fields.priority;
                     $(newDom).find(".request-createdat").text(
                         moment.utc(value.fields.created_at).format('MMMM D, YYYY, hh:mm a')
                     );
+                    $(newDom).find(".request-id").text(value.pk);
                     $(newDom).find(".request-method").text(value.fields.method);
                     $(newDom).find(".request-path").text(value.fields.path);
+                $(newDom).find(".request-priority").text(priority);
                     $(newRow).attr('id', value.pk);
+                    $(newRow).attr('priority', priority);
 
-                    $(".table").append(newRow);
+                    newRow.insertBefore(position_table[priority]);
+                    position_table[priority] = newRow;
             });
 
         })

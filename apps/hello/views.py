@@ -92,13 +92,14 @@ def requests(request):
 
 
 def requests_list(request):
-    if "last_id" not in request.GET:
+    if "last_count" not in request.GET:
         return HttpResponseBadRequest()
 
     return HttpResponse(
         serializers.serialize(
             'json',
-            list(Request.objects.filter(id__gt=request.GET["last_id"])
-                 .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS))
+            list(Request.objects
+                 .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
+                 [request.GET["last_count"]:])
         ),
         content_type="application/json")
