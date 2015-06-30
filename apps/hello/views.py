@@ -36,22 +36,7 @@ def editpage(request):
         if request.method == 'POST':
             if "application/json" in request.META["CONTENT_TYPE"]:
                 post_data = json.loads(request.body)
-                temp_img = BytesIO()
-
-                if post_data.get("photo", None):
-                    m = re.search(
-                        r"data:image/(?P<datatype>.+);base64,(?P<data>.+)",
-                        post_data["photo"],
-                        re.M)
-                    if m:
-                        datatype = m.group('datatype')
-                        temp_img.write(b64decode(m.group("data")))
-                        temp_img.seek(0)
-                        img = ImageFile(temp_img, "admin")
-                    else:
-                        img = ImageFile("", "dumbname")
-                else:
-                    img = admin.profile.photo
+                img, datatype = parse_b64_photo(admin.profile.photo, post_data)
 
                 editform = EditProfileForm(post_data, files={"photo": img})
                 if editform.is_valid():
@@ -78,6 +63,26 @@ def editpage(request):
                                                  "editform": editform})
     else:
         return HttpResponseBadRequest()
+
+
+def parse_b64_photo(user_photo, post_data):
+    datatype = ""
+    if post_data.get("photo", None):
+        temp_img = BytesIO()
+        parsed_b64_photo = re.search(
+            r"data:image/(?P<datatype>.+);base64,(?P<data>.+)",
+            post_data["photo"],
+            re.M)
+        if parsed_b64_photo:
+            datatype = parsed_b64_photo.group('datatype')
+            temp_img.write(b64decode(parsed_b64_photo.group("data")))
+            temp_img.seek(0)
+            img = ImageFile(temp_img, "admin")
+        else:
+            img = ImageFile("", "empty_photo")
+    else:
+        img = user_photo
+    return img, datatype
 
 
 def requests(request):
