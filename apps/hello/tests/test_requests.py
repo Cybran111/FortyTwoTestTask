@@ -1,4 +1,5 @@
 from django.core import serializers
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from apps.hello import settings as hello_settings
 from apps.hello.models import Request
@@ -26,14 +27,32 @@ class RequestsPageTests(TestCase):
         Requests page shouldn't contains requests
         that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""
         self.assertListEqual(
-            list(Request.objects.order_by("created_at")
+            list(Request.objects.order_by("created_at", "priority")
                  .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
                  [:hello_settings.MAX_REQUESTS]),
             list(self.response.context["requests"])
         )
 
+class RequestModelTests(TestCase):
+    DEFAULT_VALUES = {"method": "GET", "path": "/"}
 
-class RequestMiddlewareTest(TestCase):
+    def test_model_denies_priority_lte_zero(self):
+        with self.assertRaises(ValidationError):
+            for value in xrange(0, -100, -1):
+                Request.objects.create(priority=value, **self.DEFAULT_VALUES)
+
+    def test_model_denies_priority_gte_6(self):
+        with self.assertRaises(ValidationError):
+            for value in xrange(6, 100):
+                Request.objects.create(priority=value, **self.DEFAULT_VALUES)
+
+    def test_model_accepts_priority_one_to_five(self):
+        for value in xrange(1, 6):
+            request = Request.objects.create(priority=value, **self.DEFAULT_VALUES)
+            self.assertEqual(request.priority, value)
+
+
+class RequestMiddlewareTests(TestCase):
     def test_middleware_catches_good_get(self):
         """Is middleware saves good GET request?"""
         self.client.get('/')  # homepage
@@ -84,7 +103,7 @@ class RequestsListTest(TestCase):
 
         requests = serializers.serialize(
             'json',
-            list(Request.objects.order_by("created_at")
+            list(Request.objects.order_by("created_at", "priority")
                  .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
                  [LAST_ITEM_ID:])
         )
