@@ -109,7 +109,7 @@ class RequestsListTest(TestCase):
 
         response = self.client.get(
             '/requests/list/',
-            {"last_id": LAST_ITEM_ID}
+            {"last_count": LAST_ITEM_ID}
         )
 
         requests = serializers.serialize(
