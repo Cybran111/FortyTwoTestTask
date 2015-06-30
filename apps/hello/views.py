@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.files.images import ImageFile
 from django.forms import model_to_dict
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest,\
+    HttpResponseForbidden
 from django.shortcuts import render
 from io import BytesIO
 from apps.hello.forms import EditProfileForm
@@ -32,37 +33,36 @@ def homepage(request):
 @login_required
 def editpage(request):
     admin = User.objects.get(id=1)
-    if request.user == admin:
-        if request.method == 'POST':
-            if "application/json" in request.META["CONTENT_TYPE"]:
-                post_data = json.loads(request.body)
-                img, datatype = parse_b64_photo(admin.profile.photo, post_data)
+    if request.user != admin:
+        return HttpResponseForbidden("Only admin can access this page.")
 
-                editform = EditProfileForm(post_data, files={"photo": img})
-                if editform.is_valid():
-                    data = editform.cleaned_data
-                    person = Profile.objects.get(id=1)
-                    person.user.first_name = data['first_name']
-                    person.user.last_name = data['last_name']
-                    person.bio = data['bio']
-                    person.user.email = data['email']
-                    person.jabber = data['jabber']
-                    person.user.skype = data['skype']
-                    person.contacts = data['contacts']
-                    if img != admin.profile.photo:
-                        person.photo.save("photo."+datatype, img)
-                    person.save()
-                    return HttpResponse()
+    if request.method == 'POST':
+        if "application/json" not in request.META["CONTENT_TYPE"]:
+            return HttpResponseBadRequest()
 
-            else:
-                return HttpResponseBadRequest()
-        else:
-            editform = EditProfileForm(initial=admin.profile.to_dict())
+        post_data = json.loads(request.body)
+        img, datatype = parse_b64_photo(admin.profile.photo, post_data)
 
-        return render(request, "editpage.html", {"person": admin,
-                                                 "editform": editform})
+        editform = EditProfileForm(post_data, files={"photo": img})
+        if editform.is_valid():
+            data = editform.cleaned_data
+            person = Profile.objects.get(id=1)
+            person.user.first_name = data['first_name']
+            person.user.last_name = data['last_name']
+            person.bio = data['bio']
+            person.user.email = data['email']
+            person.jabber = data['jabber']
+            person.user.skype = data['skype']
+            person.contacts = data['contacts']
+            if img != admin.profile.photo:
+                person.photo.save("photo."+datatype, img)
+            person.save()
+            return HttpResponse()
     else:
-        return HttpResponseBadRequest()
+        editform = EditProfileForm(initial=admin.profile.to_dict())
+
+    return render(request, "editpage.html", {"person": admin,
+                                             "editform": editform})
 
 
 def parse_b64_photo(user_photo, post_data):
