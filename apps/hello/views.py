@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 def homepage(request):
     logger.info(u"Accessed homepage by %s on %s route"
                 % (request.method, request.path))
-    person = User.objects.get(pk=1)
+    person = User.objects.get(username="admin")
     logger.debug(u"Returned User object %s with next data: {%s}"
                  % (person,
                     u", ".join(u"'{0}': '{1}'".format(k, v)
@@ -33,7 +33,7 @@ def homepage(request):
 
 @login_required
 def editpage(request):
-    admin = User.objects.get(id=1)
+    admin = User.objects.get(username="admin")
     if request.user != admin:
         return HttpResponseForbidden("Only admin can access this page.")
 
@@ -87,7 +87,7 @@ def parse_b64_photo(encoded_photo):
 
 def requests(request):
     if request.method == 'POST':
-        if request.user != User.objects.get(id=1):
+        if request.user != User.objects.get(username="admin"):
             return HttpResponseForbidden()
         req = Request.objects.get(id=request.POST["request"])
         req.priority = request.POST["priority"]
