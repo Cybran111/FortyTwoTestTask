@@ -1,5 +1,6 @@
 from django.core import serializers
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from apps.hello import settings as hello_settings
 from apps.hello.models import Request
@@ -32,6 +33,29 @@ class RequestsPageTests(TestCase):
                  [:hello_settings.MAX_REQUESTS]),
             list(self.response.context["requests"])
         )
+
+
+class RequestPagePostTests(TestCase):
+    fixtures = ["requests.json"]
+
+    def test_redirect_to_get_after_post(self):
+        """After POST view should redirect to itself but with GET method"""
+        self.client.login(username="admin", password="admin")
+        response = self.client.post(reverse("requests"),
+                                    {"request": 5, "priority": 4})
+        self.assertRedirects(response, reverse("requests"))
+
+    def test_view_changes_priority(self):
+        """View should change priority of chosen request"""
+        self.client.login(username="admin", password="admin")
+        self.client.post(reverse("requests"), {"request": 5, "priority": 4})
+        self.assertEqual(4, Request.objects.get(id=5).priority)
+
+    def test_view_denies_post_not_from_admin(self):
+        """View should prevent POST requests from anyone but admin"""
+        response = self.client.post(reverse("requests"),
+                                    {"request": 5, "priority": 4})
+        self.assertEqual(403, response.status_code)
 
 
 class RequestModelTests(TestCase):
