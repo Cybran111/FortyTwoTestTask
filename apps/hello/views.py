@@ -13,7 +13,7 @@ from django.shortcuts import render
 from io import BytesIO
 from apps.hello.forms import EditProfileForm
 import settings as hello_settings
-from apps.hello.models import Request, Profile
+from apps.hello.models import Request
 
 logger = logging.getLogger(__name__)
 
@@ -41,22 +41,17 @@ def editpage(request):
             return HttpResponseBadRequest()
 
         post_data = json.loads(request.body)
-        img, datatype = parse_b64_photo(admin.profile.photo, post_data)
+        img, datatype = get_photo(post_data)
 
-        editform = EditProfileForm(post_data, files={"photo": img})
+        editform = EditProfileForm(post_data, files={
+            "photo": img or admin.profile.photo
+        })
+
         if editform.is_valid():
-            data = editform.cleaned_data
-            person = Profile.objects.get(id=1)
-            person.user.first_name = data['first_name']
-            person.user.last_name = data['last_name']
-            person.bio = data['bio']
-            person.user.email = data['email']
-            person.jabber = data['jabber']
-            person.user.skype = data['skype']
-            person.contacts = data['contacts']
-            if img != admin.profile.photo:
-                person.photo.save("photo."+datatype, img)
-            person.save()
+            admin.profile.update_user(editform.cleaned_data)
+            if img:
+                admin.profile.photo.save("photo.%s" % datatype, img)
+            admin.save()
             return HttpResponse()
     else:
         editform = EditProfileForm(initial=admin.profile.to_dict())
@@ -65,23 +60,27 @@ def editpage(request):
                                              "editform": editform})
 
 
-def parse_b64_photo(user_photo, post_data):
+def get_photo(data):
+    encoded_photo = data.get("photo", None)
+    if not encoded_photo:
+        return None, None
+    return parse_b64_photo(data["photo"])
+
+
+def parse_b64_photo(encoded_photo):
+    temp_img = BytesIO()
+    parsed_photo = re.search(
+        r"data:image/(?P<datatype>.+);base64,(?P<data>.+)",
+        encoded_photo,
+        re.M)
     datatype = ""
-    if post_data.get("photo", None):
-        temp_img = BytesIO()
-        parsed_b64_photo = re.search(
-            r"data:image/(?P<datatype>.+);base64,(?P<data>.+)",
-            post_data["photo"],
-            re.M)
-        if parsed_b64_photo:
-            datatype = parsed_b64_photo.group('datatype')
-            temp_img.write(b64decode(parsed_b64_photo.group("data")))
-            temp_img.seek(0)
-            img = ImageFile(temp_img, "admin")
-        else:
-            img = ImageFile("", "empty_photo")
+    if parsed_photo:
+        datatype = parsed_photo.group('datatype')
+        temp_img.write(b64decode(parsed_photo.group("data")))
+        temp_img.seek(0)
+        img = ImageFile(temp_img, "admin")
     else:
-        img = user_photo
+        img = ImageFile("", "empty_photo")
     return img, datatype
 
 
