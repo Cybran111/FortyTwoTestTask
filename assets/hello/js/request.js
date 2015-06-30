@@ -11,11 +11,11 @@ $( document ).ready(function() {
     var missedRequests = 0;
     var newRow, newDom;
     var position_table = {
-        1: $(".request[priority='1']").first(),
-        2: $(".request[priority='2']").first(),
-        3: $(".request[priority='3']").first(),
-        4: $(".request[priority='4']").first(),
-        5: $(".request[priority='5']").first()
+        1: $(".request[priority='1']").last(),
+        2: $(".request[priority='2']").last(),
+        3: $(".request[priority='3']").last(),
+        4: $(".request[priority='4']").last(),
+        5: $(".request[priority='5']").last()
     };
     console.log(position_table);
 
@@ -37,7 +37,7 @@ $( document ).ready(function() {
                     missedRequests = missedRequests + data.length;
                     document.title = "(" + missedRequests + ") " + initialTitle;
             }
-            $.each(data.reverse(), function (key, value) {
+            $.each(data, function (key, value) {
                     newRow = clonedRequestRow.clone();
                     newDom = $(newRow).get(0);
                     var priority = value.fields.priority;
@@ -47,13 +47,19 @@ $( document ).ready(function() {
                     $(newDom).find(".request-id").text(value.pk);
                     $(newDom).find(".request-method").text(value.fields.method);
                     $(newDom).find(".request-path").text(value.fields.path);
-                $(newDom).find(".request-priority").text(priority);
+                    $(newDom).find(".request-priority").text(priority);
                     $(newRow).attr('id', value.pk);
                     $(newRow).attr('priority', priority);
 
-                    newRow.insertBefore(position_table[priority]);
+                    for (var i = priority; i >= 1; i--){
+                        if (position_table[i].length != 0) {
+                            position_table[i].after(newRow);
+                            break;
+                        }
+                    }
                     position_table[priority] = newRow;
             });
+
 
         })
     }
