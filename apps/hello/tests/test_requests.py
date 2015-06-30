@@ -1,4 +1,6 @@
 from django.core import serializers
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from apps.hello import settings as hello_settings
 from apps.hello.models import Request
@@ -26,14 +28,66 @@ class RequestsPageTests(TestCase):
         Requests page shouldn't contains requests
         that are in REQUESTS_IGNORE_FILTERS from hello/settings.py"""
         self.assertListEqual(
-            list(Request.objects.order_by("created_at")
+            list(Request.objects.order_by("-priority", "-created_at")
                  .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
                  [:hello_settings.MAX_REQUESTS]),
             list(self.response.context["requests"])
         )
 
 
-class RequestMiddlewareTest(TestCase):
+class RequestPagePostTests(TestCase):
+    fixtures = ["requests.json"]
+
+    def test_redirect_to_get_after_post(self):
+        """After POST view should redirect to itself but with GET method"""
+        self.client.login(username="admin", password="admin")
+        response = self.client.post(reverse("requests"),
+                                    {"request": 5, "priority": 4})
+        self.assertRedirects(response, reverse("requests"))
+
+    def test_view_changes_priority(self):
+        """View should change priority of chosen request"""
+        self.client.login(username="admin", password="admin")
+        self.client.post(reverse("requests"), {"request": 5, "priority": 4})
+        self.assertEqual(4, Request.objects.get(id=5).priority)
+
+    def test_view_denies_post_not_from_admin(self):
+        """View should prevent POST requests from anyone but admin"""
+        response = self.client.post(reverse("requests"),
+                                    {"request": 5, "priority": 4})
+        self.assertEqual(403, response.status_code)
+
+
+class RequestModelTests(TestCase):
+    fixtures = ["requests.json"]
+    DEFAULT_VALUES = {"method": "GET", "path": "/"}
+
+    def test_model_denies_priority_lte_zero(self):
+        """Model should raise ValidationError if priority <= 0"""
+        for value in xrange(0, -100, -1):
+            with self.assertRaises(ValidationError):
+                Request.objects.create(priority=value, **self.DEFAULT_VALUES)
+
+    def test_model_denies_priority_gte_6(self):
+        """Model should raise ValidationError if priority <= 6"""
+        for value in xrange(6, 100):
+            with self.assertRaises(ValidationError):
+                Request.objects.create(priority=value, **self.DEFAULT_VALUES)
+
+    def test_model_accepts_priority_one_to_five(self):
+        """Model should accept any value between 1 and 5"""
+        for value in xrange(1, 6):
+            request = Request.objects.create(priority=value,
+                                             **self.DEFAULT_VALUES)
+            self.assertEqual(request.priority, value)
+
+    def test_model_priority_default_is_three(self):
+        """Model should use 3 as default value"""
+        request = Request.objects.create(**self.DEFAULT_VALUES)
+        self.assertEqual(request.priority, 3)
+
+
+class RequestMiddlewareTests(TestCase):
     def test_middleware_catches_good_get(self):
         """Is middleware saves good GET request?"""
         self.client.get('/')  # homepage
@@ -79,12 +133,12 @@ class RequestsListTest(TestCase):
 
         response = self.client.get(
             '/requests/list/',
-            {"last_id": LAST_ITEM_ID}
+            {"last_count": LAST_ITEM_ID}
         )
 
         requests = serializers.serialize(
             'json',
-            list(Request.objects.order_by("created_at")
+            list(Request.objects.order_by("-priority", "-created_at")
                  .exclude(path__in=hello_settings.REQUESTS_IGNORE_FILTERS)
                  [LAST_ITEM_ID:])
         )
