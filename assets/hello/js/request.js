@@ -72,7 +72,8 @@ $( document ).ready(function() {
                     $(newDom).find(".request-id").text(value.pk);
                     $(newDom).find(".request-method").text(value.fields.method);
                     $(newDom).find(".request-path").text(value.fields.path);
-                    $(newDom).find(".request-priority").text(priority);
+                    $(newDom).find(".request-priority input[type='number']").val(priority);
+                    $(newDom).find(".request-priority .request-priority-value").text(priority);
                     $(newRow).attr('id', value.pk);
                     $(newRow).attr('priority', priority);
 
