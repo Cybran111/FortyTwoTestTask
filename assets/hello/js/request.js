@@ -25,15 +25,13 @@ $( document ).ready(function() {
             $(this).parents(".request").attr("id")
         );
         priorityform.find("input[name='priority']").val(
-            $(this).siblings("input[type='number']").attr("value")
+            $(this).siblings("input[type='number']").val()
         );
-        console.log(priorityform);
         priorityform.submit()
     }
 
     function showHidePriorityEdit() {
         var target = $(this).siblings("div");
-        console.log(target);
         if (target.hasClass("hidden")){
             target.removeClass("hidden")
         } else {

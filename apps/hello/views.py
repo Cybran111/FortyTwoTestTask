@@ -6,10 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.files.images import ImageFile
+from django.core.urlresolvers import reverse
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseBadRequest,\
     HttpResponseForbidden
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from io import BytesIO
 from apps.hello.forms import EditProfileForm
 import settings as hello_settings
@@ -85,6 +86,14 @@ def parse_b64_photo(encoded_photo):
 
 
 def requests(request):
+    if request.method == 'POST':
+        if request.user != User.objects.get(id=1):
+            return HttpResponseForbidden()
+        req = Request.objects.get(id=request.POST["request"])
+        req.priority = request.POST["priority"]
+        req.save()
+        return redirect(reverse("requests"))
+
     request_models = Request.objects.exclude(
         path__in=hello_settings.REQUESTS_IGNORE_FILTERS
     )[:hello_settings.MAX_REQUESTS]
