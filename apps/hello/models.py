@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django_resized import ResizedImageField
 
@@ -41,9 +42,22 @@ class Request(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     method = models.TextField()
     path = models.TextField()
+    priority = models.IntegerField(default=3,
+                                   validators=[
+                                       MaxValueValidator(5),
+                                       MinValueValidator(1)
+                                   ])
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Request, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ['-priority', '-created_at']
+
+    def __unicode__(self):
+        return u"<id: %d, priority: %d," \
+               u" date: %s>" % (self.id, self.priority, self.created_at)
 
 
 class DbAction(models.Model):
