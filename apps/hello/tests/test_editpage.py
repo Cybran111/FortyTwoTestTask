@@ -141,7 +141,7 @@ class EditPersonFormTests(TestCase):
         'birth_date': ("not a date", "invalid_date"),
         'bio': ("", "required"),
         'email': ("not an email", "invalid_email"),
-        'jabber': ("", "required"),
+        'jabber': ("not a jabber", "invalid_jabber"),
         'skype': ("", "required"),
         'contacts': ("", "required"),
         'photo': ("not an image", "invalid_image"),
@@ -151,6 +151,7 @@ class EditPersonFormTests(TestCase):
         "required": "This field is required.",
         "invalid_date": "Enter a valid date.",
         "invalid_email": "Enter a valid email address.",
+        "invalid_jabber": "Enter a valid jabber address.",
         "invalid_image": "No file was submitted. "
                          "Check the encoding type on the form.",
     }
