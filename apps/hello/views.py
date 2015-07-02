@@ -54,6 +54,8 @@ def editpage(request):
                 admin.profile.photo.save("photo.%s" % datatype, img)
             admin.save()
             return HttpResponse()
+        else:
+            return HttpResponseBadRequest(json.dumps(editform.errors))
     else:
         editform = EditProfileForm(initial=admin.profile.to_dict())
 
