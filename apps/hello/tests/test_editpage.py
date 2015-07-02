@@ -182,6 +182,16 @@ class EditPersonFormTests(TestCase):
                                     data=data,
                                     content_type='application/json')
 
-        for k, v in self.FORM_DATA.iteritems():
-            self.assertFormError(response, "editform",
-                                 k, self.ERROR_MESSAGES[v[1]])
+        errors = json.dumps({field: self.ERROR_MESSAGES[error_type]
+                             for field, (_, error_type) in self.FORM_DATA.iteritems()})
+        self.assertEqual(errors, response.content)
+
+    def test_form_birthdate_accepts_only_correct_date(self):
+        """Form's field birth_date should accept only date between 1900 year and today's day"""
+        person = Profile.objects.get(pk=1)
+        user_data = person.to_dict()
+        user_data["birth_date"] = "1850-01-02"
+        form = EditProfileForm(data=user_data,
+                               files={'photo': person.photo})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["birth_date"], "Enter a date between 1900 year and today's day.")
