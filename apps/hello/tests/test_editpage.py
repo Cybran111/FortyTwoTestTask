@@ -19,13 +19,6 @@ class EditPersonPageTests(TestCase):
         self.client.login(username='admin', password='admin')
         self.response = self.client.get('/edit/')
 
-    def test_editpage_accepts_POST_JSON(self):
-        """View should accept JSON POST request"""
-        response = self.client.post('/edit/',
-                                    json.dumps({'some': 'data'}),
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-
     def test_editpage_declines_POST_form_data(self):
         """View should decline POST request with
         multipart/form-data content type"""
@@ -141,7 +134,7 @@ class EditPersonFormTests(TestCase):
         'birth_date': ("not a date", "invalid_date"),
         'bio': ("", "required"),
         'email': ("not an email", "invalid_email"),
-        'jabber': ("", "required"),
+        'jabber': ("not a jabber", "invalid_jabber"),
         'skype': ("", "required"),
         'contacts': ("", "required"),
         'photo': ("not an image", "invalid_image"),
@@ -151,6 +144,7 @@ class EditPersonFormTests(TestCase):
         "required": "This field is required.",
         "invalid_date": "Enter a valid date.",
         "invalid_email": "Enter a valid email address.",
+        "invalid_jabber": "Enter a valid jabber address.",
         "invalid_image": "No file was submitted. "
                          "Check the encoding type on the form.",
     }
@@ -183,7 +177,7 @@ class EditPersonFormTests(TestCase):
                                     data=data,
                                     content_type='application/json')
 
-        errors = json.dumps({field: self.ERROR_MESSAGES[error_type]
+        errors = json.dumps({field: [self.ERROR_MESSAGES[error_type]]
                              for field, (_, error_type)
                              in self.FORM_DATA.iteritems()})
         self.assertEqual(errors, response.content)
