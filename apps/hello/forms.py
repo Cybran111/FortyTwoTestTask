@@ -14,7 +14,7 @@ class EditProfileForm(forms.Form):
     birth_date = DateField()
     bio = CharField(widget=Textarea)
     email = EmailField()
-    jabber = CharField()
+    jabber = EmailField(error_messages={"invalid": u"Enter a valid jabber address."})
     skype = CharField()
     contacts = CharField(widget=Textarea)
     photo = ImageField(widget=PhotoInput)
