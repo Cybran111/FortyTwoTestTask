@@ -8,7 +8,7 @@
     <script src="{% static "js/jquery.form.js" %}" type="text/javascript"></script>
     <script src="{% static "js/bootstrap.min.js" %}" type="text/javascript"></script>
     <script src="{% static "js/bootstrap-datepicker.min.js" %}" type="text/javascript"></script>
-    <script src="{% static "hello/js/editperson.js" %}" type="text/javascript"></script>
+    <script src="{% static "hello/js/edit.js" %}" type="text/javascript"></script>
 {% endblock %}
 
 {% block person-info %}
@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block person-photo %}
-    {{ editform.photo }}
+    <p>{{ editform.photo }}</p>
 {% endblock %}
 
 {% block person-generalcontacts %}
@@ -32,7 +32,7 @@
 {% endblock %}
 
 {% block person-bio %}
-    {{ editform.bio }}
+    <p>{{ editform.bio }}</p>
 {% endblock %}
 
 {% block pre_content %}

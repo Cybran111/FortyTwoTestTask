@@ -1,6 +1,7 @@
 from base64 import b64encode
 import json
 import StringIO
+from datetime import date, timedelta
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -17,13 +18,6 @@ class EditPersonPageTests(TestCase):
     def setUp(self):
         self.client.login(username='admin', password='admin')
         self.response = self.client.get('/edit/')
-
-    def test_editpage_accepts_POST_JSON(self):
-        """View should accept JSON POST request"""
-        response = self.client.post('/edit/',
-                                    json.dumps({'some': 'data'}),
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
 
     def test_editpage_declines_POST_form_data(self):
         """View should decline POST request with
@@ -140,7 +134,7 @@ class EditPersonFormTests(TestCase):
         'birth_date': ("not a date", "invalid_date"),
         'bio': ("", "required"),
         'email': ("not an email", "invalid_email"),
-        'jabber': ("", "required"),
+        'jabber': ("not a jabber", "invalid_jabber"),
         'skype': ("", "required"),
         'contacts': ("", "required"),
         'photo': ("not an image", "invalid_image"),
@@ -150,6 +144,7 @@ class EditPersonFormTests(TestCase):
         "required": "This field is required.",
         "invalid_date": "Enter a valid date.",
         "invalid_email": "Enter a valid email address.",
+        "invalid_jabber": "Enter a valid jabber address.",
         "invalid_image": "No file was submitted. "
                          "Check the encoding type on the form.",
     }
@@ -182,6 +177,46 @@ class EditPersonFormTests(TestCase):
                                     data=data,
                                     content_type='application/json')
 
-        for k, v in self.FORM_DATA.iteritems():
-            self.assertFormError(response, "editform",
-                                 k, self.ERROR_MESSAGES[v[1]])
+        errors = json.dumps({field: [self.ERROR_MESSAGES[error_type]]
+                             for field, (_, error_type)
+                             in self.FORM_DATA.iteritems()})
+        self.assertEqual(errors, response.content)
+
+    def test_form_birthdate_denies_date_before_1900(self):
+        """Form's field birth_date should deny
+        date before 1900 year"""
+        person = Profile.objects.get(pk=1)
+        user_data = person.to_dict()
+        user_data["birth_date"] = "1850-01-01"
+        form = EditProfileForm(data=user_data,
+                               files={'photo': person.photo})
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["birth_date"][0],
+                         u"Enter a date between 1900 year and today's day.")
+
+    def test_form_birthdate_denies_date_after_today(self):
+        """Form's field birth_date should deny
+        date after today's day"""
+        person = Profile.objects.get(pk=1)
+        user_data = person.to_dict()
+        user_data["birth_date"] = (date.today() + timedelta(days=1))\
+            .strftime("%Y-%m-%d")
+        form = EditProfileForm(data=user_data,
+                               files={'photo': person.photo})
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["birth_date"][0],
+                         u"Enter a date between 1900 year and today's day.")
+
+    def test_form_birthdate_accepts_correct_date(self):
+        """Form's field birth_date should accept correct date"""
+        person = Profile.objects.get(pk=1)
+        user_data = person.to_dict()
+        user_data["birth_date"] = (date.today() + timedelta(days=-1))\
+            .strftime("%Y-%m-%d")
+        form = EditProfileForm(data=user_data,
+                               files={'photo': person.photo})
+
+        self.assertTrue(form.is_valid())
+        self.assertFalse("birth_date" in form.errors)

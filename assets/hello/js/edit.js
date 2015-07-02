@@ -35,6 +35,23 @@ $(document).ready(function () {
         }
     };
 
+    function removeErrors() {
+        $(".error").remove();
+        $(".bg-danger").removeClass("bg-danger")
+    }
+
+    function showErrors(errors){
+        parsed_errors = $.parseJSON(errors.responseText);
+
+        $.each(parsed_errors, function(field, error) {
+
+            var parent = $( "#id_"+field).parent();
+            parent.addClass("bg-danger");
+            parent.prepend("<p class='error'>" + error +"</p>");
+        })
+
+
+    }
 
     var bar = $('#progress-bar');
     var percent = $('#percent');
@@ -44,7 +61,6 @@ $(document).ready(function () {
 
     function startUpload() {
         var csrftoken = data["csrfmiddlewaretoken"];
-        delete data["csrfmiddlewaretoken"];
 
         data["photo"] = typeof photo === 'undefined' ? "" : Base64._utf8_encode(fr.result) ;
 
@@ -88,10 +104,18 @@ $(document).ready(function () {
                 bar.width(percentVal);
                 percent.html(percentVal);
                 editform.find(':input:disabled').prop('disabled', false);
+                status.removeClass("hidden");
             },
 
             success: function () {
-                status.removeClass("hidden");
+                removeErrors();
+                status.text("Changes have been saved");
+            },
+
+            error: function(errors) {
+                removeErrors();
+                status.text("Error! Changes haven't been saved");
+                showErrors(errors);
             }
 
         });
@@ -102,14 +126,12 @@ $(document).ready(function () {
         autoclose: true
     });
 
-
-    var data = {};
-    $.each(editform.find(':input[name]:not([name=photo])'), function (number, el) {
-        data[$(el).attr("name")] = $(el).val();
-    });
-
     $(editform).submit(function (event) {
         event.preventDefault();
+        data = {};
+        $.each(editform.find(':input[name]:not([name=photo])'), function (number, el) {
+            data[$(el).attr("name")] = $(el).val();
+        });
         photo = editform.find(':input[name=photo]')[0].files[0];
         if (photo) {
             fr = new FileReader();
