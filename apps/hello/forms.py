@@ -1,5 +1,4 @@
 from datetime import date
-from datetime import date
 from django.forms import forms, CharField, DateField, \
     EmailField, ImageField, Textarea, ClearableFileInput
 
@@ -16,16 +15,17 @@ class EditProfileForm(forms.Form):
     birth_date = DateField()
     bio = CharField(widget=Textarea)
     email = EmailField()
-    jabber = EmailField(error_messages={"invalid": u"Enter a valid jabber address."})
+    jabber = EmailField(error_messages={
+        "invalid": u"Enter a valid jabber address."})
     skype = CharField()
     contacts = CharField(widget=Textarea)
     photo = ImageField(widget=PhotoInput)
 
-def clean_birth_date(self):
-    birth_date = self.cleaned_data['birth_date']
-    
-    if not date(1900, 1, 1) < birth_date < date.today():
-        raise forms.ValidationError(
-            "Enter a date between 1900 year and today's day.")
-    
-    return birth_date
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data['birth_date']
+
+        if not date(1900, 1, 1) < birth_date < date.today():
+            raise forms.ValidationError(
+                "Enter a date between 1900 year and today's day.")
+
+        return birth_date
