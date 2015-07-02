@@ -1,6 +1,7 @@
 from base64 import b64encode
 import json
 import StringIO
+from datetime import date, timedelta
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -183,15 +184,45 @@ class EditPersonFormTests(TestCase):
                                     content_type='application/json')
 
         errors = json.dumps({field: self.ERROR_MESSAGES[error_type]
-                             for field, (_, error_type) in self.FORM_DATA.iteritems()})
+                             for field, (_, error_type)
+                             in self.FORM_DATA.iteritems()})
         self.assertEqual(errors, response.content)
 
-    def test_form_birthdate_accepts_only_correct_date(self):
-        """Form's field birth_date should accept only date between 1900 year and today's day"""
+    def test_form_birthdate_denies_date_before_1900(self):
+        """Form's field birth_date should deny
+        date before 1900 year"""
         person = Profile.objects.get(pk=1)
         user_data = person.to_dict()
-        user_data["birth_date"] = "1850-01-02"
+        user_data["birth_date"] = "1850-01-01"
         form = EditProfileForm(data=user_data,
                                files={'photo': person.photo})
+
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["birth_date"], "Enter a date between 1900 year and today's day.")
+        self.assertEqual(form.errors["birth_date"][0],
+                         u"Enter a date between 1900 year and today's day.")
+
+    def test_form_birthdate_denies_date_after_today(self):
+        """Form's field birth_date should deny
+        date after today's day"""
+        person = Profile.objects.get(pk=1)
+        user_data = person.to_dict()
+        user_data["birth_date"] = (date.today() + timedelta(days=1))\
+            .strftime("%Y-%m-%d")
+        form = EditProfileForm(data=user_data,
+                               files={'photo': person.photo})
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["birth_date"][0],
+                         u"Enter a date between 1900 year and today's day.")
+
+    def test_form_birthdate_accepts_correct_date(self):
+        """Form's field birth_date should accept correct date"""
+        person = Profile.objects.get(pk=1)
+        user_data = person.to_dict()
+        user_data["birth_date"] = (date.today() + timedelta(days=-1))\
+            .strftime("%Y-%m-%d")
+        form = EditProfileForm(data=user_data,
+                               files={'photo': person.photo})
+
+        self.assertTrue(form.is_valid())
+        self.assertFalse("birth_date" in form.errors)
